@@ -1,0 +1,127 @@
+{
+  "project_info": {
+    "project_number": "306839633711",
+    "firebase_url": "https://my-shared-list.firebaseio.com",
+    "project_id": "my-shared-list",
+    "storage_bucket": "my-shared-list.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:306839633711:android:4183d2cf4b0b633690abda",
+        "android_client_info": {
+          "package_name": "com.example.firebaseauthentification"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "306839633711-qf4mgqja7nkc6edjg6cfaqgik4ui02uc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBck-xbRZbFiqQxct9SbbDInvlTsIwPwKk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "306839633711-qf4mgqja7nkc6edjg6cfaqgik4ui02uc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:306839633711:android:0daa3688c44e0d6290abda",
+        "android_client_info": {
+          "package_name": "com.example.mysharedlist"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "306839633711-qf4mgqja7nkc6edjg6cfaqgik4ui02uc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBck-xbRZbFiqQxct9SbbDInvlTsIwPwKk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "306839633711-qf4mgqja7nkc6edjg6cfaqgik4ui02uc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:306839633711:android:1572137024cdcc5290abda",
+        "android_client_info": {
+          "package_name": "online.litterae.familyorganizer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "306839633711-qf4mgqja7nkc6edjg6cfaqgik4ui02uc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBck-xbRZbFiqQxct9SbbDInvlTsIwPwKk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "306839633711-qf4mgqja7nkc6edjg6cfaqgik4ui02uc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:306839633711:android:1888df5861fca00d90abda",
+        "android_client_info": {
+          "package_name": "online.litterae.familyplanner"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "306839633711-qf4mgqja7nkc6edjg6cfaqgik4ui02uc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBck-xbRZbFiqQxct9SbbDInvlTsIwPwKk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "306839633711-qf4mgqja7nkc6edjg6cfaqgik4ui02uc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

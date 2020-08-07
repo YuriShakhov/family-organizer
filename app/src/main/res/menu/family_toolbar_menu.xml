@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/mi_choose_group"
+        android:title="Choose group"
+        android:orderInCategory="1"
+        app:showAsAction="never"
+        android:onClick="chooseGroupMenu"
+        />
+    <item
+        android:id="@+id/mi_create_group"
+        android:title="Create group"
+        android:orderInCategory="2"
+        app:showAsAction="never"
+        android:onClick="createGroupMenu"
+        />
+    <item
+        android:id="@+id/mi_invite"
+        android:title="Send invitation"
+        android:orderInCategory="3"
+        app:showAsAction="never"
+        />
+    <item
+        android:id="@+id/mi_profile"
+        android:title="Show profile"
+        android:orderInCategory="4"
+        app:showAsAction="never"
+        android:onClick="showProfileMenu"
+        />
+    <item
+        android:id="@+id/mi_log_out"
+        android:title="Log out"
+        android:orderInCategory="4"
+        app:showAsAction="never"
+        android:onClick="logoutMenu"
+        />
+</menu>
