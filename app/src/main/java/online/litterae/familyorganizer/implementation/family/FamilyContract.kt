@@ -12,7 +12,7 @@ interface FamilyContract {
         fun showCurrentGroup(group: MyGroup?)
         fun showFriends(friends: List<MyFriend?>?)
         fun showChooseGroupMenu(groups: List<MyGroup?>)
-        fun showErrorMessage(message: String)
+        fun showMessage(message: String)
     }
 
     interface Presenter: BasePresenterInterface<FamilyContract.View> {
@@ -21,6 +21,7 @@ interface FamilyContract {
         fun changeCurrentGroup(myGroup: MyGroup)
         fun createGroup(groupName: String)
         fun logout()
+        fun reportSuccess(message: String)
         fun reportError(message: String)
     }
 

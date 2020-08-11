@@ -62,7 +62,6 @@ class FamilyActivity : PageActivity(), FamilyContract.View {
             .setView(editGroupName)
             .setPositiveButton("Create") {dialog, which ->
                 presenter.createGroup(editGroupName.getText().toString())
-                Toast.makeText(this, "Group $editGroupName created", Toast.LENGTH_SHORT).show()
             }
             .setNegativeButton("Cancel") {dialog, which ->}
             .create()
@@ -119,7 +118,7 @@ class FamilyActivity : PageActivity(), FamilyContract.View {
         }
     }
 
-    override fun showErrorMessage(message: String) {
+    override fun showMessage(message: String) {
         Toast.makeText(this, message,Toast.LENGTH_SHORT).show()
     }
 

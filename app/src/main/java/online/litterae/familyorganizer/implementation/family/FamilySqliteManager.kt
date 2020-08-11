@@ -8,16 +8,13 @@ import online.litterae.familyorganizer.sqlite.MyGroup
 
 class FamilySqliteManager: BaseSqliteManager<FamilyContract.Presenter>(), FamilyContract.SqliteManager {
 
-    val defaultScope = CoroutineScope(Dispatchers.Default)
-//    val myGroupDao = database.myGroupDao()
-
     override fun init() {
         MainApplication.getAppComponent().createPageComponent().inject(this)
     }
 
     override suspend fun addMyModeratedGroupToSQLite(groupName: String, groupFirebaseKey: String) {
-//        myGroupDao?.let {
-            defaultScope.launch {
+        val job = CoroutineScope(Dispatchers.Default)
+            .launch {
                 val group = MyGroup()
                 group.firebaseKey = groupFirebaseKey
                 group.name = groupName
@@ -26,19 +23,18 @@ class FamilySqliteManager: BaseSqliteManager<FamilyContract.Presenter>(), Family
                 myGroupDao?.insert(group)
                 myGroupDao?.setGroupAsCurrent(groupFirebaseKey)
             }
-//        }
+        job.join()
     }
 
     override suspend fun getMyCurrentGroup(): MyGroup? {
         var result: MyGroup? = null
-        val job = defaultScope.launch {
-            val myGroupDao = database.myGroupDao()
-//            myGroupDao?.let {
+        val job = CoroutineScope(Dispatchers.Default)
+            .launch {
+                val myGroupDao = database.myGroupDao()
                 val deferred = async {
                     myGroupDao?.getMyCurrentGroup()
                 }
                 result = deferred.await()
-//            }
         }
         job.join()
         return result
@@ -46,25 +42,23 @@ class FamilySqliteManager: BaseSqliteManager<FamilyContract.Presenter>(), Family
 
     override suspend fun getAllGroups() : List<MyGroup?>? {
         var result: List<MyGroup?>? = null
-        val job = defaultScope.launch {
-//            myGroupDao?.let {
-                val deferred = GlobalScope.async {
-                    myGroupDao?.getAll()
-                }
+        val job = CoroutineScope(Dispatchers.Default)
+            .launch {
+                val deferred = CoroutineScope(Dispatchers.Default)
+                    .async {
+                        myGroupDao?.getAll()
+                    }
                 result = deferred.await()
-//            }
         }
         job.join()
         return result
     }
 
     override suspend fun setGroupAsCurrent(groupFirebaseKey: String) {
-//        myGroupDao?.let {
-            myGroupDao?.setGroupAsCurrent(groupFirebaseKey)
-//        }
+        myGroupDao?.setGroupAsCurrent(groupFirebaseKey)
     }
 
-    // This is a stub. The function will query the db and return the members of the current group
+    // This is a stub. The function will query the SQLite DB and return members of the current group
     override suspend fun getFriends(): List<MyFriend> {
         val father = MyFriend()
         father.name = "Father"

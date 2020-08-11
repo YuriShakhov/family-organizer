@@ -1,6 +1,8 @@
 package online.litterae.familyorganizer.sqlite
 
+import android.util.Log
 import androidx.room.*
+import online.litterae.familyorganizer.application.Const.Companion.TAG
 
 @Dao
 interface MyGroupDao {
