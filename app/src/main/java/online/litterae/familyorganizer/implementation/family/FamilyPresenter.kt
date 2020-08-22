@@ -2,7 +2,6 @@ package online.litterae.familyorganizer.implementation.family
 
 import android.util.Log
 import kotlinx.coroutines.*
-import kotlinx.coroutines.Dispatchers.Main
 import online.litterae.familyorganizer.application.MainApplication
 import online.litterae.familyorganizer.abstracts.presenter.PagePresenter
 import online.litterae.familyorganizer.application.Const.Companion.ERROR_INSERT_GROUP
@@ -12,7 +11,6 @@ import online.litterae.familyorganizer.firebase.Invitation
 import online.litterae.familyorganizer.sqlite.MyFriend
 import online.litterae.familyorganizer.sqlite.MyGroup
 import javax.inject.Inject
-import kotlin.coroutines.CoroutineContext
 
 class FamilyPresenter : PagePresenter<FamilyContract.View>(), FamilyContract.Presenter {
 
@@ -106,8 +104,8 @@ class FamilyPresenter : PagePresenter<FamilyContract.View>(), FamilyContract.Pre
         }
     }
 
-    override fun sendInvitation(myGroup: MyGroup, email: String, message: String) {
-        val invitation = Invitation(myGroup.firebaseKey, myGroup.name, email, message)
+    override fun sendInvitation(myGroup: MyGroup, invitedEmail: String, message: String) {
+        val invitation = Invitation(myGroup.firebaseKey, myGroup.name, invitedEmail, message)
         val invitationFirebaseKey = firebaseManager.addInvitationToFirebase(invitation)
         Log.d(TAG, "sendInvitation: invitationFirebaseKey: $invitationFirebaseKey")
         if (invitationFirebaseKey != null) {

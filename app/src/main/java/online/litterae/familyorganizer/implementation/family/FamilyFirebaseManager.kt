@@ -31,6 +31,7 @@ class FamilyFirebaseManager: BaseFirebaseManager<FamilyContract.Presenter>(), Fa
     }
 
     override fun addInvitationToFirebase(invitation: Invitation): String? {
+        invitation.senderEmail = email.toString()
         val invitationFirebaseKey = dbReference.child(TABLE_INVITATIONS).push().getKey()
         val insertInvitation = mutableMapOf<String, Any>()
         insertInvitation["/$TABLE_INVITATIONS/$invitationFirebaseKey"] = invitation.toMap()

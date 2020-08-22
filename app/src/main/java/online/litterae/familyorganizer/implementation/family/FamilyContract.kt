@@ -23,7 +23,7 @@ interface FamilyContract {
         suspend fun getCurrentGroupFromSqlite(): Pair<MyGroup?, Boolean>
         fun changeCurrentGroup(myGroup: MyGroup)
         fun createGroup(groupName: String)
-        fun sendInvitation(myGroup: MyGroup, email: String, message: String)
+        fun sendInvitation(myGroup: MyGroup, invitedEmail: String, message: String)
         fun logout()
         fun reportSuccess(message: String)
         fun reportError(message: String)

@@ -5,7 +5,6 @@ import kotlinx.coroutines.*
 import online.litterae.familyorganizer.abstracts.sqlite.BaseSqliteManager
 import online.litterae.familyorganizer.application.Const.Companion.TAG
 import online.litterae.familyorganizer.application.MainApplication
-import online.litterae.familyorganizer.firebase.Email
 import online.litterae.familyorganizer.firebase.Invitation
 import online.litterae.familyorganizer.sqlite.MyFriend
 import online.litterae.familyorganizer.sqlite.MyGroup
@@ -91,7 +90,7 @@ class FamilySqliteManager: BaseSqliteManager<FamilyContract.Presenter>(), Family
 //            .launch {
         Log.d(TAG, "sqliteManager: addSentInvitationToSqlite")
                 val mySentInvitation = MySentInvitation()
-                mySentInvitation.email = invitation.email
+                mySentInvitation.email = invitation.invitedEmail
                 mySentInvitation.groupName = invitation.groupName
                 mySentInvitation.groupFirebaseKey = invitation.groupFirebaseKey
                 mySentInvitation.message = invitation.message
