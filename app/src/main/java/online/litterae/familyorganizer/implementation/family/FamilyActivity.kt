@@ -1,19 +1,20 @@
 package online.litterae.familyorganizer.implementation.family
 
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.Toast
+import android.util.Log
+import android.view.*
+import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import kotlinx.android.synthetic.main.activity_family.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import online.litterae.familyorganizer.application.MainApplication
+import online.litterae.familyorganizer.application.Const.Companion.TAG
 import online.litterae.familyorganizer.R
 import online.litterae.familyorganizer.abstracts.view.PageActivity
 import online.litterae.familyorganizer.application.Const.Companion.CANCEL_DIALOG
@@ -27,16 +28,18 @@ class FamilyActivity : PageActivity(), FamilyContract.View {
 
     @Inject lateinit var presenter : FamilyContract.Presenter
 
-    var friendsNames: MutableList<String> = ArrayList()
+    var friendsNames: List<String> = ArrayList()
     lateinit var adapter: FriendAdapter
+    lateinit var toolBarMenu: Menu
 
     override fun init(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_family)
         setRecyclerView()
         setBottomMenu()
+        toolBarMenu = tb_family.menu
         MainApplication.getAppComponent().createPageComponent().inject(this)
         presenter.attach(this)
-        presenter.getData()
+        presenter.setData()
     }
 
     private fun setRecyclerView () {
@@ -56,7 +59,7 @@ class FamilyActivity : PageActivity(), FamilyContract.View {
     }
 
     fun createGroupMenu(item: MenuItem) {
-        val editGroupName: EditText = EditText(this)
+        val editGroupName = EditText(this)
         AlertDialog.Builder(this)
             .setTitle("Enter group name:")
             .setView(editGroupName)
@@ -68,7 +71,38 @@ class FamilyActivity : PageActivity(), FamilyContract.View {
             .show()
     }
 
-    fun showProfileMenu(item: MenuItem) {
+    fun inviteMenu(item: MenuItem) {
+//        Log.d(TAG, "inviteMenu: start")
+        CoroutineScope(Dispatchers.Default).launch {
+            val currentGroup = presenter.getCurrentGroupFromSqlite().first
+            currentGroup?.let {
+                Log.d(TAG, "inviteMenu: prepare alertdialog")
+                val groupName = it.name
+                val editEmail = EditText(this@FamilyActivity)
+                editEmail.hint = "Enter email"
+                val editMessage = EditText(this@FamilyActivity)
+                editMessage.hint = "Write a message"
+//                Log.d(TAG, "inviteMenu: groupName: $groupName, editEmail: $editEmail, editMessage: $editMessage")
+                val layout = LinearLayout(this@FamilyActivity)
+                layout.orientation = LinearLayout.VERTICAL
+                layout.addView(editEmail)
+                layout.addView(editMessage)
+                withContext(Dispatchers.Main) {
+                    AlertDialog.Builder(this@FamilyActivity)
+                        .setTitle("Invite a new member to group $groupName")
+                        .setView(layout)
+                        .setPositiveButton("Send") {dialog, which ->
+                            presenter.sendInvitation(it, editEmail.text.toString(), editMessage.text.toString())
+                        }
+                        .setNegativeButton(CANCEL_DIALOG, null)
+                        .create()
+                        .show()
+                }
+            }
+        }
+    }
+
+    fun profileMenu(item: MenuItem) {
 
     }
 
@@ -76,17 +110,10 @@ class FamilyActivity : PageActivity(), FamilyContract.View {
         presenter.logout()
     }
 
-    override fun showChooseGroupMenu(groups: List<MyGroup?>) {
-        val groupsNamesList : MutableList<String> = ArrayList()
-        val groupsList : MutableList<MyGroup> = ArrayList()
-        for (myGroup: MyGroup? in groups) {
-            myGroup?.let{
-                groupsNamesList.add(myGroup.name)
-                groupsList.add(myGroup)
-            }
-        }
+    override fun showChooseGroupMenu(groups: List<MyGroup>) {
+        val groupsNamesList = ArrayList(groups.map{it.name})
         var groupIndex = 0
-        for (myGroup: MyGroup in groupsList) {  //Get index of the current group
+        for (myGroup: MyGroup in groups) {  //Get index of the current group
             if (myGroup.myCurrentGroup == 1) {
                 break
             }
@@ -95,27 +122,26 @@ class FamilyActivity : PageActivity(), FamilyContract.View {
         AlertDialog.Builder(this)
             .setTitle(CHOOSE_GROUP_DIALOG)
             .setSingleChoiceItems(groupsNamesList.toTypedArray(), groupIndex, { _, which -> groupIndex = which})
-            .setPositiveButton(OK_DIALOG, { _, which -> presenter.changeCurrentGroup(groupsList[groupIndex])})
+            .setPositiveButton(OK_DIALOG, { _, which -> presenter.changeCurrentGroup(groups[groupIndex])})
             .setNegativeButton(CANCEL_DIALOG, null)
             .create()
             .show()
     }
 
-    override fun showCurrentGroup(group: MyGroup?) {
-        tvUserName.setText(group?.name)
+    override fun showCurrentGroup(group: MyGroup?, isMyModeratedGroup: Boolean) {
+        Log.d(TAG, "showCurrentGroup: ${group?.name}, isMyModeratedGroup: $isMyModeratedGroup")
+        tvGroupName.setText(group?.name)
+        if (isMyModeratedGroup) {
+            val inviteMenuItem = toolBarMenu.findItem(R.id.mi_invite)
+            inviteMenuItem.setVisible(true)
+            Log.d(TAG, "showCurrentGroup: menu: $toolBarMenu, inviteMenu: $inviteMenuItem, visible: ${inviteMenuItem.isVisible}")
+        }
     }
 
-    override fun showFriends(friends: List<MyFriend?>?) {
-        friends?.let{
-            val newFriendsNames: MutableList<String> = ArrayList()
-            for (friend in friends) {
-                friend?.let {
-                    newFriendsNames.add(friend.name)
-                }
-            }
-            friendsNames = newFriendsNames
-            adapter.notifyDataSetChanged()
-        }
+    override fun showFriends(friends: List<MyFriend>) {
+        val newFriendsNames = friends.map { it.name }
+        friendsNames = newFriendsNames
+        adapter.notifyDataSetChanged()
     }
 
     override fun showMessage(message: String) {

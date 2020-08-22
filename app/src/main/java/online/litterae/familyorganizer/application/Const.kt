@@ -17,6 +17,7 @@ class Const {
         const val SEND_INVITATION = "Send"
         const val INVITED = "Invited"
         const val ERROR_INSERT_GROUP = "Firebase error: couldn't get database key for new group"
+        const val ERROR_SEND_INVITATION = "Firebase error: couldn't get database key for new invitation"
 
         //Dialog
         const val OK_DIALOG = "OK"

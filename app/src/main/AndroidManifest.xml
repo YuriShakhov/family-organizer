@@ -3,27 +3,27 @@
     package="online.litterae.familyorganizer">
 
     <application
-        android:name="online.litterae.familyorganizer.application.MainApplication"
+        android:name=".application.MainApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name="online.litterae.familyorganizer.implementation.login.LoginActivity">
+        <activity android:name=".implementation.profile.ProfileActivity"></activity>
+        <activity android:name=".implementation.login.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="online.litterae.familyorganizer.implementation.groupchat.GroupChatActivity" />
-        <activity android:name="online.litterae.familyorganizer.implementation.singlechat.ChatActivity" />
-        <activity android:name="online.litterae.familyorganizer.implementation.family.FamilyActivity" />
-        <activity android:name="online.litterae.familyorganizer.implementation.notes.NotesActivity" />
-        <activity android:name="online.litterae.familyorganizer.implementation.shopping.ShoppingActivity" />
-        <activity android:name="online.litterae.familyorganizer.implementation.planner.PlannerActivity">
-        </activity>
+        <activity android:name=".implementation.groupchat.GroupChatActivity" />
+        <activity android:name=".implementation.singlechat.ChatActivity" />
+        <activity android:name=".implementation.family.FamilyActivity" />
+        <activity android:name=".implementation.notes.NotesActivity" />
+        <activity android:name=".implementation.shopping.ShoppingActivity" />
+        <activity android:name=".implementation.planner.PlannerActivity" />
     </application>
 
 </manifest>

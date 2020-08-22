@@ -20,13 +20,15 @@
         android:title="Send invitation"
         android:orderInCategory="3"
         app:showAsAction="never"
+        android:onClick="inviteMenu"
+        android:visible="false"
         />
     <item
         android:id="@+id/mi_profile"
         android:title="Show profile"
         android:orderInCategory="4"
         app:showAsAction="never"
-        android:onClick="showProfileMenu"
+        android:onClick="profileMenu"
         />
     <item
         android:id="@+id/mi_log_out"

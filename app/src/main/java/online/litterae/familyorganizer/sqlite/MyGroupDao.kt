@@ -27,6 +27,9 @@ interface MyGroupDao {
     @Query("SELECT * FROM MyGroup WHERE myCurrentGroup = 1")
     suspend fun getMyCurrentGroup(): MyGroup
 
+    @Query("SELECT iAmAdmin FROM MyGroup WHERE myCurrentGroup = 1")
+    suspend fun isMyModeratedGroup(): Int?
+
     @Query("UPDATE MyGroup SET myCurrentGroup = 1 WHERE firebaseKey = :firebaseKey")
     suspend fun markGroupAsCurrent(firebaseKey: String)
 

@@ -4,6 +4,7 @@ import online.litterae.familyorganizer.abstracts.presenter.BasePresenterInterfac
 import online.litterae.familyorganizer.abstracts.view.BaseViewInterface
 import online.litterae.familyorganizer.sqlite.MyDatabase
 import online.litterae.familyorganizer.sqlite.MyGroupDao
+import online.litterae.familyorganizer.sqlite.MySentInvitationDao
 import javax.inject.Inject
 
 abstract class BaseSqliteManager<P: BasePresenterInterface<out BaseViewInterface>> : BaseSqliteManagerInterface<P> {
@@ -13,6 +14,11 @@ abstract class BaseSqliteManager<P: BasePresenterInterface<out BaseViewInterface
     @Inject
     @JvmField
     var myGroupDao: MyGroupDao? = null
+
+    @Inject
+    @JvmField
+    var mySentInvitationDao: MySentInvitationDao? = null
+
 
     protected var presenter: P? = null
         private set

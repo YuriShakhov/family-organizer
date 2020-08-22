@@ -15,4 +15,8 @@ class SQLiteModule {
     @PageScope
     @Provides
     fun provideMyGroupDao(database: MyDatabase) : MyGroupDao? = database.myGroupDao()
+
+    @PageScope
+    @Provides
+    fun provideMySentInvitationDao(database: MyDatabase) : MySentInvitationDao? = database.mySentInvitationDao()
 }
