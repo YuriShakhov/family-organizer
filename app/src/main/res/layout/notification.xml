@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_margin="16dp">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:id="@+id/layout_notification_message"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="72dp">
+
+            <ImageView
+                android:id="@+id/iv_notification"
+                android:layout_width="32dp"
+                android:layout_height="match_parent"
+                android:layout_margin="16dp"
+                android:src="@drawable/ic_notifications" />
+
+            <TextView
+                android:id="@+id/tv_notification"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_margin="8dp"
+                android:text="User a@mail.com invites you to join group Groupname" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/layout_notification_buttons"
+            android:orientation="horizontal"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            >
+
+            <Button
+                android:id="@+id/bt_accept_invitation"
+                android:layout_width="120dp"
+                android:layout_height="48dp"
+                android:text="Accept"
+                />
+
+            <Button
+                android:id="@+id/bt_decline_invitation"
+                android:layout_width="120dp"
+                android:layout_height="48dp"
+                android:layout_marginLeft="16dp"
+                android:text="Decline"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>

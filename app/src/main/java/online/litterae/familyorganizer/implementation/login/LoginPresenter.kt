@@ -49,7 +49,6 @@ class LoginPresenter : BasePresenter<LoginContract.View>(), LoginContract.Presen
             val insertProfile: MutableMap<String, Any> = HashMap()
             insertProfile["/${Const.TABLE_PROFILES}/$key"] = profileMap
             dbReference.updateChildren(insertProfile)
-//            SQLiteManager.saveMyFirebaseKeyToSQLite(key, email)
             saveMyFirebaseKeyToSharedPrefs(key, email)
         } else {
             view?.showErrorMessage("Firebase error: couldn't get database key for new profile")

@@ -14,7 +14,7 @@ class NotesActivity : PageActivity(), NotesContract.View {
     override fun init(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_notes)
         setBottomMenu()
-        MainApplication.getAppComponent().createPageComponent().inject(this)
+        MainApplication.createPageComponent().inject(this)
         presenter.attach(this)
     }
 

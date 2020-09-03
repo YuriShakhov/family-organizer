@@ -1,7 +1,9 @@
 package online.litterae.familyorganizer.application
 
 import android.app.Application
+import android.util.Log
 import androidx.room.Room
+import online.litterae.familyorganizer.application.Const.Companion.TAG
 import online.litterae.familyorganizer.dagger.AppComponent
 import online.litterae.familyorganizer.dagger.DaggerAppComponent
 import online.litterae.familyorganizer.dagger.PageComponent

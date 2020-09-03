@@ -11,4 +11,5 @@ class MySentInvitation {
     var message = ""
     var groupFirebaseKey = ""
     var groupName = ""
+    var status = ""
 }

@@ -1,10 +1,15 @@
 package online.litterae.familyorganizer.sqlite
 
+import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import online.litterae.familyorganizer.application.MainApplication
 import online.litterae.familyorganizer.dagger.PageScope
 import online.litterae.familyorganizer.firebase.Email
+import online.litterae.familyorganizer.implementation.notifications.NotificationsHolder
+import online.litterae.familyorganizer.implementation.notifications.ReceivedInvitationNotification
+import online.litterae.familyorganizer.implementation.notifications.ReceivedMessageNotification
+import online.litterae.familyorganizer.implementation.notifications.ReplyToInvitationNotification
 
 @Module
 class SQLiteModule {
@@ -14,9 +19,21 @@ class SQLiteModule {
 
     @PageScope
     @Provides
-    fun provideMyGroupDao(database: MyDatabase) : MyGroupDao? = database.myGroupDao()
+    fun provideMyGroupDao(database: MyDatabase) : MyGroupDao = database.myGroupDao()
 
     @PageScope
     @Provides
-    fun provideMySentInvitationDao(database: MyDatabase) : MySentInvitationDao? = database.mySentInvitationDao()
+    fun provideMyFriendDao(database: MyDatabase) : MyFriendDao = database.myFriendDao()
+
+    @PageScope
+    @Provides
+    fun provideMySentInvitationDao(database: MyDatabase) : MySentInvitationDao = database.mySentInvitationDao()
+
+    @PageScope
+    @Provides
+    fun provideMyReceivedInvitationDao(database: MyDatabase) : MyReceivedInvitationDao = database.myReceivedInvitationDao()
+
+    @PageScope
+    @Provides
+    fun provideMyNotificationDao(database: MyDatabase) : MyNotificationDao = database.myNotificationDao()
 }

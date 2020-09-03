@@ -14,7 +14,7 @@ class ShoppingActivity : PageActivity(), ShoppingContract.View {
     override fun init(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_shopping)
         setBottomMenu()
-        MainApplication.getAppComponent().createPageComponent().inject(this)
+        MainApplication.createPageComponent().inject(this)
         presenter.attach(this)
     }
 

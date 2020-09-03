@@ -2,12 +2,16 @@ package online.litterae.familyorganizer.implementation.family
 
 import android.util.Log
 import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers.Default
+import kotlinx.coroutines.Dispatchers.Main
 import online.litterae.familyorganizer.application.MainApplication
 import online.litterae.familyorganizer.abstracts.presenter.PagePresenter
 import online.litterae.familyorganizer.application.Const.Companion.ERROR_INSERT_GROUP
 import online.litterae.familyorganizer.application.Const.Companion.ERROR_SEND_INVITATION
+import online.litterae.familyorganizer.application.Const.Companion.INVITATION_KEY_DEFAULT
 import online.litterae.familyorganizer.application.Const.Companion.TAG
 import online.litterae.familyorganizer.firebase.Invitation
+import online.litterae.familyorganizer.implementation.notifications.ReceivedInvitationNotification
 import online.litterae.familyorganizer.sqlite.MyFriend
 import online.litterae.familyorganizer.sqlite.MyGroup
 import javax.inject.Inject
@@ -18,29 +22,46 @@ class FamilyPresenter : PagePresenter<FamilyContract.View>(), FamilyContract.Pre
     @Inject lateinit var firebaseManager: FamilyContract.FirebaseManager
 
     override fun init() {
-        MainApplication.getAppComponent().createPageComponent().inject(this)
+        MainApplication.createPageComponent().inject(this)
         sqliteManager.attach(this)
         firebaseManager.attach(this)
+        notificationsHolder.attach(this)
+        super.init()
     }
 
-    override fun setData() {
-        setCurrentGroupNameInView()
-        setFriendsInView()
+    override fun setDataInView() {
+        setCurrentGroupInView()
+        setNotificationsCount()
     }
 
-    fun setCurrentGroupNameInView() {
-        CoroutineScope(Dispatchers.Default).launch {
-            val result = getCurrentGroupFromSqlite()
-            withContext(Dispatchers.Main) {
-                view?.showCurrentGroup(result.first, result.second)
+    fun setCurrentGroupInView() {
+        CoroutineScope(Default).launch {
+            val currentGroup = getCurrentGroup()
+            val myGroup = currentGroup.first
+            val isMyModeratedGroup = currentGroup.second
+            withContext(Main) {
+                view?.showCurrentGroup(myGroup, isMyModeratedGroup)
+            }
+            myGroup?.let {
+                setFriendsInView(it)
+                firebaseManager.subscribeToUpdates(it)
+            }
+        }
+    }
+    
+    fun setFriendsInView(group: MyGroup) {
+        CoroutineScope(Default).launch {
+            val friends = sqliteManager.getFriends(group)
+            withContext(Main) {
+                view?.showFriends(friends)
             }
         }
     }
 
-    override suspend fun getCurrentGroupFromSqlite(): Pair<MyGroup?, Boolean> {
+    override suspend fun getCurrentGroup(): Pair<MyGroup?, Boolean> {
         var myGroup: MyGroup? = null
-        var isMyModeratedGroup: Boolean = false
-        val job = CoroutineScope(Dispatchers.Default
+        var isMyModeratedGroup = false
+        val job = CoroutineScope(Default
         ).launch {
             val result = sqliteManager.getMyCurrentGroup()
             myGroup = result.first
@@ -50,35 +71,27 @@ class FamilyPresenter : PagePresenter<FamilyContract.View>(), FamilyContract.Pre
         return Pair(myGroup, isMyModeratedGroup)
     }
 
-    fun setFriendsInView() {
-        CoroutineScope(Dispatchers.Default)
-            .launch {
-            var friends: List<MyFriend> = listOf()
-            val job = launch {
-                friends = sqliteManager.getFriends()
-            }
-            job.join()
-            withContext(Dispatchers.Main) {
-                view?.showFriends(friends)
-            }
-        }
+    fun setNotificationsCount() {
+        val count = notificationsHolder.getNewNotificationsCount()
+        setNotifications(count)
     }
 
     override fun changeCurrentGroup(myGroup: MyGroup) {
-        CoroutineScope(Dispatchers.Default)
-            .launch{
+        CoroutineScope(Default).launch{
             val job = launch {
                 sqliteManager.setGroupAsCurrent(myGroup.firebaseKey)
             }
             job.join()
-            setData()
+            withContext(Main) {
+                setDataInView()
+            }
         }
     }
 
     override fun getGroupsList() {
-        CoroutineScope(Dispatchers.Default).launch {
+        CoroutineScope(Default).launch {
             val myGroups = sqliteManager.getAllGroups()
-            withContext(Dispatchers.Main) {
+            withContext(Main) {
                 view?.showChooseGroupMenu(myGroups)
             }
         }
@@ -88,16 +101,16 @@ class FamilyPresenter : PagePresenter<FamilyContract.View>(), FamilyContract.Pre
         val groupFirebaseKey = firebaseManager.addGroupToFirebase(groupName)
         if (groupFirebaseKey != null) {
             firebaseManager.addMeToFirebaseGroupUsers(groupName, groupFirebaseKey)
-            CoroutineScope(Dispatchers.Default)
+            CoroutineScope(Default)
                 .launch {
                 val job = launch {
-                    sqliteManager.addMyModeratedGroupToSQLite(groupName, groupFirebaseKey)
+                    sqliteManager.addMyModeratedGroupToSqlite(groupName, groupFirebaseKey)
                 }
                 job.join()
-                withContext(Dispatchers.Main) {
+                withContext(Main) {
                     reportSuccess("Group $groupName created")
+                    setDataInView()
                 }
-                setData()
             }
         } else {
             reportError(ERROR_INSERT_GROUP)
@@ -105,26 +118,70 @@ class FamilyPresenter : PagePresenter<FamilyContract.View>(), FamilyContract.Pre
     }
 
     override fun sendInvitation(myGroup: MyGroup, invitedEmail: String, message: String) {
-        val invitation = Invitation(myGroup.firebaseKey, myGroup.name, invitedEmail, message)
-        val invitationFirebaseKey = firebaseManager.addInvitationToFirebase(invitation)
-        Log.d(TAG, "sendInvitation: invitationFirebaseKey: $invitationFirebaseKey")
-        if (invitationFirebaseKey != null) {
-            CoroutineScope(Dispatchers.Default)
-                .launch {
-                    Log.d(TAG, "sendInvitation: try addSentInvitationToSqlite")
-                    sqliteManager.addSentInvitationToSqlite(invitation, invitationFirebaseKey)
-                }
+        if (invitedEmail.contains("@")) {
+            val invitation = Invitation(myGroup.firebaseKey, myGroup.name, invitedEmail, message)
+            firebaseManager.addInvitationToFirebase(invitation)
         } else {
-            reportError(ERROR_SEND_INVITATION)
-            Log.d(TAG, "sendInvitation: $ERROR_SEND_INVITATION")
+            reportError("Please enter email")
         }
      }
 
+    override fun onInvitationAddedToFirebase(invitation: Invitation) {
+        if (invitation.invitationFirebaseKey != INVITATION_KEY_DEFAULT) {
+            CoroutineScope(Default)
+                .launch {
+                    sqliteManager.addSentInvitationToSqlite(invitation)
+                }
+        } else {
+            reportError(ERROR_SEND_INVITATION)
+        }
+    }
+
+    override fun updateFriends(newFriends: List<Pair<String, String>>) {
+        CoroutineScope(Default)
+            .launch {
+                val myCurrentGroup = sqliteManager.getMyCurrentGroup().first
+                myCurrentGroup?.let {
+                    val currentFriends = sqliteManager.getFriends(myCurrentGroup)
+                    val currentFriendsIds: List<String>
+                            = currentFriends.map { it.userFirebaseKey }
+                    val newFriendsIds: List<String>
+                            = newFriends.map { it.first }
+                    if (!currentFriendsIds.equals(newFriendsIds)) {
+                        val job = launch {
+                            sqliteManager.updateFriends(myCurrentGroup, currentFriends, newFriends, firebaseKey.toString())
+                        }
+                        job.join()
+                        setFriendsInView(myCurrentGroup)
+                    }
+                }
+            }
+    }
+
+    override fun processReceivedInvitation(invitation: Invitation) {
+        Log.e("SC*1", "FamilyPresenter: processing received invitation $invitation")
+        CoroutineScope(Default).launch {
+            sqliteManager.addReceivedInvitationToSqlite(invitation)
+            val receivedInvitations = MainApplication.getDatabase(email.toString()).myReceivedInvitationDao().getAll()
+            Log.e("SC*1", "Received invitations: $receivedInvitations")
+        }
+        val notification = ReceivedInvitationNotification(invitation)
+        notificationsHolder.addNotification(notification)
+    }
+
     override fun reportSuccess(message: String) {
-        view?.showMessage(message)
+        view?.showToast(message)
     }
 
     override fun reportError(message: String) {
-        view?.showMessage(message)
+        view?.showToast(message)
     }
+
+    override fun setNotifications(count: Int) {
+        view?.showNotifications(count)
+        Log.d(TAG, "FamilyPresenter: setNotifications: OK")
+        Log.e("SC*1", "FamilyPresenter: $count notifications")
+    }
+
+    override fun getEmail(): String = email.toString()
 }

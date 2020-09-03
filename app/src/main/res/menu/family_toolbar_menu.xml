@@ -2,6 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/mi_notifications"
+        android:title="Notifications"
+        android:orderInCategory="0"
+        app:showAsAction="ifRoom"
+        android:icon="@drawable/toolbar_notifications_icon"
+        android:onClick="notificationsMenu"
+        />
+    <item
         android:id="@+id/mi_choose_group"
         android:title="Choose group"
         android:orderInCategory="1"

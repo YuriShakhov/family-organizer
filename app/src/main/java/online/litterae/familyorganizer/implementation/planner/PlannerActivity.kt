@@ -15,7 +15,7 @@ class PlannerActivity : PageActivity(), PlannerContract.View {
     override fun init(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_planner)
         setBottomMenu()
-        MainApplication.getAppComponent().createPageComponent().inject(this)
+        MainApplication.createPageComponent().inject(this)
         presenter.attach(this)
     }
 

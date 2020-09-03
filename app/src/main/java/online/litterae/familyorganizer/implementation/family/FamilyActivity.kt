@@ -1,5 +1,7 @@
 package online.litterae.familyorganizer.implementation.family
 
+import android.content.Intent
+import android.graphics.drawable.LayerDrawable
 import android.os.Bundle
 import android.util.Log
 import android.view.*
@@ -8,6 +10,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_family.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -20,6 +23,10 @@ import online.litterae.familyorganizer.abstracts.view.PageActivity
 import online.litterae.familyorganizer.application.Const.Companion.CANCEL_DIALOG
 import online.litterae.familyorganizer.application.Const.Companion.CHOOSE_GROUP_DIALOG
 import online.litterae.familyorganizer.application.Const.Companion.OK_DIALOG
+import online.litterae.familyorganizer.implementation.groupchat.GroupChatActivity
+import online.litterae.familyorganizer.implementation.notifications.CountDrawable
+import online.litterae.familyorganizer.implementation.notifications.NotificationsActivity
+import online.litterae.familyorganizer.implementation.singlechat.ChatActivity
 import online.litterae.familyorganizer.sqlite.MyFriend
 import online.litterae.familyorganizer.sqlite.MyGroup
 import javax.inject.Inject
@@ -28,7 +35,8 @@ class FamilyActivity : PageActivity(), FamilyContract.View {
 
     @Inject lateinit var presenter : FamilyContract.Presenter
 
-    var friendsNames: List<String> = ArrayList()
+    var friendsList: List<MyFriend> = ArrayList()
+//    var friendsNames: List<String> = ArrayList()
     lateinit var adapter: FriendAdapter
     lateinit var toolBarMenu: Menu
 
@@ -37,9 +45,13 @@ class FamilyActivity : PageActivity(), FamilyContract.View {
         setRecyclerView()
         setBottomMenu()
         toolBarMenu = tb_family.menu
-        MainApplication.getAppComponent().createPageComponent().inject(this)
+        MainApplication.createPageComponent().inject(this)
+    }
+
+    override fun onStart() {
+        super.onStart()
         presenter.attach(this)
-        presenter.setData()
+        presenter.setDataInView()
     }
 
     private fun setRecyclerView () {
@@ -52,6 +64,10 @@ class FamilyActivity : PageActivity(), FamilyContract.View {
 
     override fun setSelectedItem(bottomMenu: BottomNavigationView) {
         bottomMenu.selectedItemId = R.id.page_family
+    }
+
+    fun notificationsMenu(menuItem: MenuItem) {
+        startActivity(Intent(this, NotificationsActivity::class.java))
     }
 
     fun chooseGroupMenu(menuItem: MenuItem) {
@@ -74,7 +90,7 @@ class FamilyActivity : PageActivity(), FamilyContract.View {
     fun inviteMenu(item: MenuItem) {
 //        Log.d(TAG, "inviteMenu: start")
         CoroutineScope(Dispatchers.Default).launch {
-            val currentGroup = presenter.getCurrentGroupFromSqlite().first
+            val currentGroup = presenter.getCurrentGroup().first
             currentGroup?.let {
                 Log.d(TAG, "inviteMenu: prepare alertdialog")
                 val groupName = it.name
@@ -103,7 +119,7 @@ class FamilyActivity : PageActivity(), FamilyContract.View {
     }
 
     fun profileMenu(item: MenuItem) {
-
+        showToast(presenter.getEmail())
     }
 
     fun logoutMenu(item: MenuItem) {
@@ -128,9 +144,34 @@ class FamilyActivity : PageActivity(), FamilyContract.View {
             .show()
     }
 
+    override fun showNotifications(count: Int) {
+        val notificationsMenuItem = toolBarMenu.findItem(R.id.mi_notifications)
+        val icon = notificationsMenuItem.icon as LayerDrawable
+        val badge = CountDrawable(this)
+        badge.setCount(count.toString())
+        icon.mutate()
+        icon.setDrawableByLayerId(R.id.ic_notifications_count, badge)
+        notificationsMenuItem.setIcon(icon)
+    }
+
     override fun showCurrentGroup(group: MyGroup?, isMyModeratedGroup: Boolean) {
         Log.d(TAG, "showCurrentGroup: ${group?.name}, isMyModeratedGroup: $isMyModeratedGroup")
-        tvGroupName.setText(group?.name)
+        val groupName = group?.name
+        groupName?.let {
+            tvGroupName.setText(groupName)
+            tvGroupName.setOnClickListener{
+                val groupChatIntent = Intent(this@FamilyActivity, GroupChatActivity::class.java)
+                groupChatIntent.putExtra("groupName", groupName)
+                startActivity(groupChatIntent)
+            }
+            tvGroupName.setOnLongClickListener{
+                AlertDialog.Builder(this@FamilyActivity)
+                    .setMessage("Set group properties ($groupName)")
+                    .create()
+                    .show()
+                true
+            }
+        }
         if (isMyModeratedGroup) {
             val inviteMenuItem = toolBarMenu.findItem(R.id.mi_invite)
             inviteMenuItem.setVisible(true)
@@ -139,12 +180,12 @@ class FamilyActivity : PageActivity(), FamilyContract.View {
     }
 
     override fun showFriends(friends: List<MyFriend>) {
-        val newFriendsNames = friends.map { it.name }
-        friendsNames = newFriendsNames
+        friendsList = friends
+//        friendsNames = friends.map { it.name }
         adapter.notifyDataSetChanged()
     }
 
-    override fun showMessage(message: String) {
+    override fun showToast(message: String) {
         Toast.makeText(this, message,Toast.LENGTH_SHORT).show()
     }
 
@@ -154,13 +195,32 @@ class FamilyActivity : PageActivity(), FamilyContract.View {
         }
 
         override fun onBindViewHolder(holder: FriendViewHolder, position: Int) {
-            holder.userName.setText(friendsNames[position])
+            val friend = friendsList[position]
+//            val userName = friendsNames[position]
+            val friendName = friend.name
+            holder.userName.setText(friendName)
+            holder.userLayout.setOnClickListener{
+                val chatIntent = Intent(this@FamilyActivity, ChatActivity::class.java)
+                val myFriendJson = Gson().toJson(friend)
+                Log.d(TAG, "onBindViewHolder. myFriendJson: $myFriendJson")
+                chatIntent.putExtra("myFriend", myFriendJson)
+//                ChatIntent.putExtra("userName", friendName)
+                startActivity(chatIntent)
+            }
+            holder.userLayout.setOnLongClickListener{
+                AlertDialog.Builder(this@FamilyActivity)
+                    .setMessage("Set user properties ($friendName)")
+                    .create()
+                    .show()
+                true
+            }
         }
 
-        override fun getItemCount(): Int = friendsNames.size
+        override fun getItemCount(): Int = friendsList.size
     }
 
     class FriendViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val userLayout : LinearLayout = itemView.findViewById(R.id.layout_user)
         val userName : TextView = itemView.findViewById(R.id.tv_user_name)
     }
 }

@@ -10,8 +10,8 @@ interface MyFriendDao {
     @Query("SELECT * FROM MyFriend WHERE email = :email")
     fun getFriend(email: String?): MyFriend?
 
-    @Query("SELECT chatMessages FROM MyFriend WHERE email = :friendEmail")
-    fun getMessages(friendEmail: String?): String?
+    @Query("SELECT chatMessages FROM MyFriend WHERE userFirebaseKey = :friendFirebaseKey")
+    fun getMessages(friendFirebaseKey: String?): String?
 
     @Query("SELECT userFirebaseKey FROM MyFriend WHERE email = :email")
     fun getFirebaseKey(email: String?): String?
