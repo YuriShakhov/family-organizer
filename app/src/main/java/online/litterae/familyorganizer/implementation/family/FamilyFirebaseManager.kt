@@ -24,7 +24,8 @@ class FamilyFirebaseManager: BaseFirebaseManager<FamilyContract.Presenter>(), Fa
     lateinit var invitationsRef: DatabaseReference
     lateinit var groupRef: DatabaseReference
     /*
-    Variable that keeps firebase key of the last seen invitation and thus helps to avoid processing the same invitation twice
+    Variable seenInvitationKey keeps firebase key of the last seen invitation
+    and thus helps to avoid processing the same invitation twice
      */
     var seenInvitationKey: String? = null
 
@@ -64,7 +65,6 @@ class FamilyFirebaseManager: BaseFirebaseManager<FamilyContract.Presenter>(), Fa
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.e(TAG, "Failed to read value from table \"Invitations\".", error.toException())
             }
         })
 
@@ -72,10 +72,10 @@ class FamilyFirebaseManager: BaseFirebaseManager<FamilyContract.Presenter>(), Fa
     }
 
     override fun addGroupToFirebase(name: String): String? {
-        val groupFirebaseKey = dbReference.child(Const.TABLE_GROUPS).push().getKey()
+        val groupFirebaseKey = dbReference.child(TABLE_GROUPS).push().getKey()
         dbReference.updateChildren(
             mapOf<String, Any>(
-                "/${Const.TABLE_GROUPS}/$groupFirebaseKey"
+                "/${TABLE_GROUPS}/$groupFirebaseKey"
                         to
                         FirebaseGroup(name).toMap()
             )
@@ -99,16 +99,13 @@ class FamilyFirebaseManager: BaseFirebaseManager<FamilyContract.Presenter>(), Fa
                 var alreadySent = false
                 for (invitationSnapshot in snapshot.children) {
                     val invited = invitationSnapshot.child(INVITED_EMAIL).value as String?
-                    Log.d(TAG, "onDataChange: invited: $invited")
                     val groupName = invitationSnapshot.child(GROUP_NAME).value as String?
                     val status = invitationSnapshot.child(INVITATION_STATUS).value as String?
-                    Log.d(TAG, "onDataChange: status: $status")
                     if (invited == invitation.invitedEmail && groupName == invitation.groupName && (status != STATUS_DECLINED)) {
                         alreadySent = true
                         break
                     }
                 }
-                Log.d(TAG, "alreadySent: $alreadySent")
                 if (alreadySent) {
                     presenter?.reportError("Invitation already sent.")
                 } else {
@@ -123,25 +120,20 @@ class FamilyFirebaseManager: BaseFirebaseManager<FamilyContract.Presenter>(), Fa
                     dbReference.updateChildren(insertInvitation)
                     presenter?.reportSuccess("${invitation.invitedEmail} invited to group ${invitation.groupName}")
                     presenter?.onInvitationAddedToFirebase(invitation)
-//                        return invitationFirebaseKey
-
                 }
 
             }
 
             override fun onCancelled(error: DatabaseError) {
             }
-
         })
 
     }
 
     override fun subscribeToUpdates(myGroup: MyGroup) {
         groupRef = dbReference.child(TABLE_GROUPS).child(myGroup.firebaseKey)
-        Log.d(TAG, "subscribeToUpdates. firebaseKey: ${myGroup.firebaseKey}")
         groupRef.child(TABLE_USERS).addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
-                Log.d(TAG, "subscribeToUpdates. onDataChange: ${snapshot.toString()}")
                 val friends = arrayListOf<Pair<String, String>>()
                 for (userSnapshot in snapshot.children) {
                     val userFirebaseKey = userSnapshot.key
@@ -154,7 +146,6 @@ class FamilyFirebaseManager: BaseFirebaseManager<FamilyContract.Presenter>(), Fa
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.e(TAG, "Failed to read value from table \"Users\".", error.toException())
             }
         })
     }

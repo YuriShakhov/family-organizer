@@ -43,10 +43,8 @@ class NotificationsActivity : BaseCompatActivity(), NotificationsContract.View {
 
     override fun onStart() {
         super.onStart()
-        Log.d(TAG, "onStart: ")
         presenter.attach(this)
         notifications = presenter.getNotifications()
-        Log.d(TAG, "NotificationsActivity. onStart: notifications.size: ${notifications.size}")
     }
 
     private fun setRecyclerView () {
@@ -73,13 +71,11 @@ class NotificationsActivity : BaseCompatActivity(), NotificationsContract.View {
                             holder.image.setImageResource(R.drawable.ic_notifications)
                             holder.layoutButtons.visibility = View.VISIBLE
                             holder.acceptButton.setOnClickListener {
-                                Log.d(TAG, "acceptButton clicked!")
                                 presenter.acceptInvitation(notification)
                                 holder.image.setImageResource(R.drawable.ic_accepted)
                                 holder.layoutButtons.visibility = View.GONE
                             }
                             holder.declineButton.setOnClickListener {
-                                Log.d(TAG, "declineButton clicked!")
                                 presenter.declineInvitation(notification)
                                 holder.image.setImageResource(R.drawable.ic_declined)
                                 holder.layoutButtons.visibility = View.GONE

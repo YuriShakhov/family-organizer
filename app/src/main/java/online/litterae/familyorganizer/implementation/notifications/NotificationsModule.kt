@@ -16,11 +16,7 @@ import javax.inject.Inject
 class NotificationsModule {
     @PageScope
     @Provides
-    fun provideNotificationsHolder(): NotificationsHolder {
-        val notificationsHolder = NotificationsHolder()
-        Log.e("SC*1", "provideNotificationsHolder: $notificationsHolder")
-        return notificationsHolder
-    }
+    fun provideNotificationsHolder(): NotificationsHolder = NotificationsHolder()
 
     @PageScope
     @Provides

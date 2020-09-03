@@ -43,8 +43,6 @@ class NotificationsHolder () {
 
     @Inject
     lateinit var myNotificationDao: MyNotificationDao
-//    @JvmField
-//    var myNotificationDao: MyNotificationDao? = null
 
     init {
         MainApplication.createPageComponent().inject(this)
@@ -64,32 +62,26 @@ class NotificationsHolder () {
             for ((_, presenter) in presenters) {
                 presenter?.setNotifications(notificationsList.size)
             }
-            Log.d(TAG, "NotificationsHolder: ${this@NotificationsHolder} 1. notificationsList.size: ${notificationsList.size}")
         }
-        Log.d(TAG, "NotificationsHolder: ${this@NotificationsHolder} 2. notificationsList.size: ${notificationsList.size}")
     }
 
     fun attach(presenter: PagePresenter<out BaseViewInterface>) {
-        Log.e("SC*1", "attach: $presenter")
         when (presenter) {
             is FamilyPresenter -> presenters[FAMILY_PRESENTER] = presenter
             is NotesPresenter -> presenters[NOTES_PRESENTER] = presenter
             is PlannerPresenter -> presenters[PLANNER_PRESENTER] = presenter
             is ShoppingPresenter -> presenters[SHOPING_PRESENTER] = presenter
         }
-        Log.e("SC*1", "presenters: ${presenters.toString()}")
     }
 
     fun getNewNotificationsCount()
             = notificationsList.filter{it.status == STATUS_NEW}.count()
 
     fun addNotification(notification: Notification){
-        Log.d(TAG, "NotificationsHolder: ${this@NotificationsHolder} addNotification1: notificationsList.size: ${notificationsList.size}")
         notificationsList.add(notification)
         for ((_, presenter) in presenters) {
             presenter?.setNotifications(notificationsList.size)
         }
-        Log.d(TAG, "NotificationsHolder: ${this@NotificationsHolder} addNotification2: notificationsList.size: ${notificationsList.size}")
     }
 
     fun changeNotificationStatusToAccepted(notification: ReceivedInvitationNotification) {

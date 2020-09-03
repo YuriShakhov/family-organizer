@@ -61,13 +61,11 @@ class FamilyPresenter : PagePresenter<FamilyContract.View>(), FamilyContract.Pre
     override suspend fun getCurrentGroup(): Pair<MyGroup?, Boolean> {
         var myGroup: MyGroup? = null
         var isMyModeratedGroup = false
-        val job = CoroutineScope(Default
-        ).launch {
+        CoroutineScope(Default).launch {
             val result = sqliteManager.getMyCurrentGroup()
             myGroup = result.first
             isMyModeratedGroup = result.second
-        }
-        job.join()
+        }.join()
         return Pair(myGroup, isMyModeratedGroup)
     }
 
@@ -78,10 +76,9 @@ class FamilyPresenter : PagePresenter<FamilyContract.View>(), FamilyContract.Pre
 
     override fun changeCurrentGroup(myGroup: MyGroup) {
         CoroutineScope(Default).launch{
-            val job = launch {
+            launch {
                 sqliteManager.setGroupAsCurrent(myGroup.firebaseKey)
-            }
-            job.join()
+            }.join()
             withContext(Main) {
                 setDataInView()
             }
@@ -101,12 +98,10 @@ class FamilyPresenter : PagePresenter<FamilyContract.View>(), FamilyContract.Pre
         val groupFirebaseKey = firebaseManager.addGroupToFirebase(groupName)
         if (groupFirebaseKey != null) {
             firebaseManager.addMeToFirebaseGroupUsers(groupName, groupFirebaseKey)
-            CoroutineScope(Default)
-                .launch {
-                val job = launch {
+            CoroutineScope(Default).launch {
+                launch {
                     sqliteManager.addMyModeratedGroupToSqlite(groupName, groupFirebaseKey)
-                }
-                job.join()
+                }.join()
                 withContext(Main) {
                     reportSuccess("Group $groupName created")
                     setDataInView()
@@ -148,10 +143,9 @@ class FamilyPresenter : PagePresenter<FamilyContract.View>(), FamilyContract.Pre
                     val newFriendsIds: List<String>
                             = newFriends.map { it.first }
                     if (!currentFriendsIds.equals(newFriendsIds)) {
-                        val job = launch {
+                        launch {
                             sqliteManager.updateFriends(myCurrentGroup, currentFriends, newFriends, firebaseKey.toString())
-                        }
-                        job.join()
+                        }.join()
                         setFriendsInView(myCurrentGroup)
                     }
                 }
@@ -159,11 +153,8 @@ class FamilyPresenter : PagePresenter<FamilyContract.View>(), FamilyContract.Pre
     }
 
     override fun processReceivedInvitation(invitation: Invitation) {
-        Log.e("SC*1", "FamilyPresenter: processing received invitation $invitation")
         CoroutineScope(Default).launch {
             sqliteManager.addReceivedInvitationToSqlite(invitation)
-            val receivedInvitations = MainApplication.getDatabase(email.toString()).myReceivedInvitationDao().getAll()
-            Log.e("SC*1", "Received invitations: $receivedInvitations")
         }
         val notification = ReceivedInvitationNotification(invitation)
         notificationsHolder.addNotification(notification)
@@ -179,8 +170,6 @@ class FamilyPresenter : PagePresenter<FamilyContract.View>(), FamilyContract.Pre
 
     override fun setNotifications(count: Int) {
         view?.showNotifications(count)
-        Log.d(TAG, "FamilyPresenter: setNotifications: OK")
-        Log.e("SC*1", "FamilyPresenter: $count notifications")
     }
 
     override fun getEmail(): String = email.toString()

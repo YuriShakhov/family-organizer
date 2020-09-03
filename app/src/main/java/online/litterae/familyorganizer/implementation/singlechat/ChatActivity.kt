@@ -19,6 +19,7 @@ import kotlinx.android.synthetic.main.activity_chat.*
 import online.litterae.familyorganizer.R
 import online.litterae.familyorganizer.abstracts.view.BaseCompatActivity
 import online.litterae.familyorganizer.application.Const
+import online.litterae.familyorganizer.application.Const.Companion.KEY_MY_FRIEND
 import online.litterae.familyorganizer.application.MainApplication
 import online.litterae.familyorganizer.dagger.PageComponent
 import online.litterae.familyorganizer.dagger.SingleChatComponent
@@ -71,10 +72,8 @@ class ChatActivity : BaseCompatActivity(), ChatContract.View {
     }
 
     override fun getFriendFromIntent(): MyFriend {
-        val myFriendJson = intent.getStringExtra("myFriend")
-        Log.d(Const.TAG, "getFriendFromIntent. myFriendJson: $myFriendJson")
+        val myFriendJson = intent.getStringExtra(KEY_MY_FRIEND)
         val myFriend = Gson().fromJson(myFriendJson, MyFriend::class.java)
-        Log.d(Const.TAG, "getFriendFromIntent. myFriend: ${myFriend.name}")
         return myFriend
     }
 

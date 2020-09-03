@@ -9,11 +9,7 @@ import online.litterae.familyorganizer.dagger.PageScope
 class FamilyModule {
     @PageScope
     @Provides
-    fun provideFamilyPresenter() : FamilyContract.Presenter {
-        val familyPresenter = FamilyPresenter()
-        Log.e("SC*1", "FamilyPresenter: $familyPresenter")
-        return familyPresenter
-    }
+    fun provideFamilyPresenter() : FamilyContract.Presenter = FamilyPresenter()
 
     @PageScope
     @Provides

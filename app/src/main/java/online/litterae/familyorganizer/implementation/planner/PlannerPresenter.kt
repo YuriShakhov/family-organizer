@@ -9,6 +9,6 @@ class PlannerPresenter : PagePresenter<PlannerContract.View>(), PlannerContract.
         super.init()
     }
 
-    override fun setNotifications(number: Int) {
+    override fun setNotifications(count: Int) {
     }
 }

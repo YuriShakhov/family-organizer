@@ -20,12 +20,10 @@ class NotificationsSqliteManager : BaseSqliteManager<NotificationsContract.Prese
 
     override suspend fun addGroupToSQLite(invitation: Invitation) {
         CoroutineScope(Dispatchers.Default).launch {
-            Log.d(TAG, "addGroupToSQLite: start")
             val myGroup = MyGroup()
             myGroup.name = invitation.groupName
             myGroup.firebaseKey = invitation.groupFirebaseKey
             myGroupDao.insert(myGroup)
-            Log.d(TAG, "addGroupToSQLite: OK")
         }
     }
 

@@ -7,7 +7,10 @@ import android.graphics.Color.red
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
 
-
+/**
+ * Source: https://medium.com/mindorks/making-actionbar-beautiful-by-showing-count-on-actionbar-icon-ed3a3a1a74ea
+ * with some minor changes applied
+ */
 class CountDrawable(context: Context) : Drawable() {
     private val mBadgePaint: Paint
     private val mTextPaint: Paint
@@ -59,11 +62,9 @@ class CountDrawable(context: Context) : Drawable() {
     }
 
     override fun setAlpha(alpha: Int) {
-        // do nothing
     }
 
     override fun setColorFilter(cf: ColorFilter?) {
-        // do nothing
     }
 
     override fun getOpacity(): Int {

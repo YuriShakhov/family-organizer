@@ -24,6 +24,7 @@ class ChatFirebaseManager(val friendFirebaseKey: String)
         myMessagesRef = dbReference.child(TABLE_PROFILES)
             .child(firebaseKey.toString())
             .child(friendFirebaseKey)
+
         friendMessagesRef = dbReference.child(TABLE_PROFILES)
             .child(friendFirebaseKey)
             .child(firebaseKey.toString())

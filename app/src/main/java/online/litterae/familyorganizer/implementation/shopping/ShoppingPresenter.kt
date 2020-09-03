@@ -9,6 +9,6 @@ class ShoppingPresenter: PagePresenter<ShoppingContract.View>(), ShoppingContrac
         super.init()
     }
 
-    override fun setNotifications(number: Int) {
+    override fun setNotifications(count: Int) {
     }
 }

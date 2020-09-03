@@ -22,6 +22,7 @@ import online.litterae.familyorganizer.R
 import online.litterae.familyorganizer.abstracts.view.PageActivity
 import online.litterae.familyorganizer.application.Const.Companion.CANCEL_DIALOG
 import online.litterae.familyorganizer.application.Const.Companion.CHOOSE_GROUP_DIALOG
+import online.litterae.familyorganizer.application.Const.Companion.KEY_MY_FRIEND
 import online.litterae.familyorganizer.application.Const.Companion.OK_DIALOG
 import online.litterae.familyorganizer.implementation.groupchat.GroupChatActivity
 import online.litterae.familyorganizer.implementation.notifications.CountDrawable
@@ -36,7 +37,6 @@ class FamilyActivity : PageActivity(), FamilyContract.View {
     @Inject lateinit var presenter : FamilyContract.Presenter
 
     var friendsList: List<MyFriend> = ArrayList()
-//    var friendsNames: List<String> = ArrayList()
     lateinit var adapter: FriendAdapter
     lateinit var toolBarMenu: Menu
 
@@ -88,17 +88,14 @@ class FamilyActivity : PageActivity(), FamilyContract.View {
     }
 
     fun inviteMenu(item: MenuItem) {
-//        Log.d(TAG, "inviteMenu: start")
         CoroutineScope(Dispatchers.Default).launch {
             val currentGroup = presenter.getCurrentGroup().first
             currentGroup?.let {
-                Log.d(TAG, "inviteMenu: prepare alertdialog")
                 val groupName = it.name
                 val editEmail = EditText(this@FamilyActivity)
                 editEmail.hint = "Enter email"
                 val editMessage = EditText(this@FamilyActivity)
                 editMessage.hint = "Write a message"
-//                Log.d(TAG, "inviteMenu: groupName: $groupName, editEmail: $editEmail, editMessage: $editMessage")
                 val layout = LinearLayout(this@FamilyActivity)
                 layout.orientation = LinearLayout.VERTICAL
                 layout.addView(editEmail)
@@ -155,7 +152,6 @@ class FamilyActivity : PageActivity(), FamilyContract.View {
     }
 
     override fun showCurrentGroup(group: MyGroup?, isMyModeratedGroup: Boolean) {
-        Log.d(TAG, "showCurrentGroup: ${group?.name}, isMyModeratedGroup: $isMyModeratedGroup")
         val groupName = group?.name
         groupName?.let {
             tvGroupName.setText(groupName)
@@ -175,13 +171,11 @@ class FamilyActivity : PageActivity(), FamilyContract.View {
         if (isMyModeratedGroup) {
             val inviteMenuItem = toolBarMenu.findItem(R.id.mi_invite)
             inviteMenuItem.setVisible(true)
-            Log.d(TAG, "showCurrentGroup: menu: $toolBarMenu, inviteMenu: $inviteMenuItem, visible: ${inviteMenuItem.isVisible}")
         }
     }
 
     override fun showFriends(friends: List<MyFriend>) {
         friendsList = friends
-//        friendsNames = friends.map { it.name }
         adapter.notifyDataSetChanged()
     }
 
@@ -196,15 +190,12 @@ class FamilyActivity : PageActivity(), FamilyContract.View {
 
         override fun onBindViewHolder(holder: FriendViewHolder, position: Int) {
             val friend = friendsList[position]
-//            val userName = friendsNames[position]
             val friendName = friend.name
             holder.userName.setText(friendName)
             holder.userLayout.setOnClickListener{
                 val chatIntent = Intent(this@FamilyActivity, ChatActivity::class.java)
                 val myFriendJson = Gson().toJson(friend)
-                Log.d(TAG, "onBindViewHolder. myFriendJson: $myFriendJson")
-                chatIntent.putExtra("myFriend", myFriendJson)
-//                ChatIntent.putExtra("userName", friendName)
+                chatIntent.putExtra(KEY_MY_FRIEND, myFriendJson)
                 startActivity(chatIntent)
             }
             holder.userLayout.setOnLongClickListener{

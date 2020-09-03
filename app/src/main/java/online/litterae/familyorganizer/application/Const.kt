@@ -36,5 +36,8 @@ class Const {
         const val STATUS_SEEN = "Seen"
         const val STATUS_ACCEPTED = "Accepted"
         const val STATUS_DECLINED = "Declined"
+
+        //keys
+        const val KEY_MY_FRIEND = "myFriend"
     }
 }

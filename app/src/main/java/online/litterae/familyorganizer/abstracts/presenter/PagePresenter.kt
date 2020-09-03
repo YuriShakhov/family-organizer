@@ -18,7 +18,7 @@ abstract class PagePresenter<V: BaseViewInterface> : BasePresenter<V>() {
 
     override fun init() {}
 
-    abstract fun setNotifications(number: Int)
+    abstract fun setNotifications(count: Int)
 
     fun logout () {
         MainApplication.releasePageComponent()

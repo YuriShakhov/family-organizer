@@ -23,7 +23,7 @@ class NotificationsPresenter : PagePresenter<NotificationsContract.View>(), Noti
         super.init()
     }
 
-    override fun setNotifications(number: Int) {
+    override fun setNotifications(count: Int) {
     }
 
     override fun getNotifications() = notificationsHolder.notificationsList
