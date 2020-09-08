@@ -3,7 +3,6 @@ package online.litterae.familyorganizer.implementation.notifications
 import online.litterae.familyorganizer.R
 import android.content.Context
 import android.graphics.*
-import android.graphics.Color.red
 import android.graphics.drawable.Drawable
 import androidx.core.content.ContextCompat
 
@@ -29,7 +28,7 @@ class CountDrawable(context: Context) : Drawable() {
         // Position the badge in the top-right quadrant of the icon.
 
         /*Using Math.max rather than Math.min */
-        val radius = Math.max(width, height) / 2 / 2
+        val radius = width.coerceAtLeast(height) / 2 / 2
         val centerX = width - radius - 1 + 5
         val centerY = radius - 5
         if (mCount.length <= 2) {
@@ -74,19 +73,17 @@ class CountDrawable(context: Context) : Drawable() {
     init {
         val mTextSize: Float = context.resources.getDimension(R.dimen.badge_count_textsize)
         mBadgePaint = Paint()
-        mBadgePaint.setColor(
-            ContextCompat.getColor(
-                context.getApplicationContext(),
-                R.color.red
-            )
+        mBadgePaint.color = ContextCompat.getColor(
+            context.applicationContext,
+            R.color.red
         )
-        mBadgePaint.setAntiAlias(true)
-        mBadgePaint.setStyle(Paint.Style.FILL)
+        mBadgePaint.isAntiAlias = true
+        mBadgePaint.style = Paint.Style.FILL
         mTextPaint = Paint()
-        mTextPaint.setColor(Color.WHITE)
-        mTextPaint.setTypeface(Typeface.DEFAULT)
-        mTextPaint.setTextSize(mTextSize)
-        mTextPaint.setAntiAlias(true)
-        mTextPaint.setTextAlign(Paint.Align.CENTER)
+        mTextPaint.color = Color.WHITE
+        mTextPaint.typeface = Typeface.DEFAULT
+        mTextPaint.textSize = mTextSize
+        mTextPaint.isAntiAlias = true
+        mTextPaint.textAlign = Paint.Align.CENTER
     }
 }

@@ -5,13 +5,9 @@ import online.litterae.familyorganizer.abstracts.presenter.BasePresenterInterfac
 import online.litterae.familyorganizer.abstracts.sqlite.BaseSqliteManagerInterface
 import online.litterae.familyorganizer.abstracts.view.BaseViewInterface
 import online.litterae.familyorganizer.firebase.Invitation
-import online.litterae.familyorganizer.implementation.family.FamilyContract
-import online.litterae.familyorganizer.sqlite.MyFriend
-import online.litterae.familyorganizer.sqlite.MyGroup
 
 interface NotificationsContract {
-    interface View: BaseViewInterface {
-    }
+    interface View: BaseViewInterface
 
     interface Presenter: BasePresenterInterface<NotificationsContract.View> {
         fun getNotifications(): ArrayList<Notification>

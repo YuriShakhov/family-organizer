@@ -11,14 +11,12 @@ import javax.inject.Inject
 abstract class BaseFirebaseManager<P: BasePresenterInterface<out BaseViewInterface>>: BaseFirebaseManagerInterface<P> {
     @Inject lateinit var mAuth : FirebaseAuth
     @Inject lateinit var dbReference : DatabaseReference
-    @Inject lateinit var email: Email
-    @Inject lateinit var firebaseKey: FirebaseKey
+    @Inject lateinit var myEmail: Email
+    @Inject lateinit var myFirebaseKey: FirebaseKey
 
     protected var presenter: P? = null
-        private set
 
     override fun attach(presenter: P) {
-        init()
         this.presenter = presenter
     }
 }

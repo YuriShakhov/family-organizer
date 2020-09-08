@@ -22,7 +22,7 @@ class FamilySqliteManager: BaseSqliteManager<FamilyContract.Presenter>(), Family
         CoroutineScope(Default)
             .launch {
                 val group = MyGroup()
-                group.firebaseKey = groupFirebaseKey
+                group.groupFirebaseKey = groupFirebaseKey
                 group.name = groupName
                 group.iAmAdmin = 1
                 group.myCurrentGroup = 1
@@ -43,10 +43,10 @@ class FamilySqliteManager: BaseSqliteManager<FamilyContract.Presenter>(), Family
                 }
                 val myCurrentGroup: MyGroup? = myCurrentGroupDeferred.await()
                 val isMyModerated: Int? = isMyModeratedDeferred.await()
-                if (isMyModerated == null || isMyModerated == 0) {
-                    result = Pair(myCurrentGroup, false)
+                result = if (isMyModerated == null || isMyModerated == 0) {
+                    Pair(myCurrentGroup, false)
                 } else {
-                    result = Pair(myCurrentGroup, true)
+                    Pair(myCurrentGroup, true)
                 }
             }.join()
         return result
@@ -62,8 +62,7 @@ class FamilySqliteManager: BaseSqliteManager<FamilyContract.Presenter>(), Family
                     }
                 groupsFound = deferred.await()
             }.join()
-        val result: List<MyGroup> = groupsFound?.mapNotNull { it } ?: emptyList()
-        return result
+        return groupsFound?.mapNotNull { it } ?: emptyList()
     }
 
     override suspend fun setGroupAsCurrent(groupFirebaseKey: String) {
@@ -71,8 +70,7 @@ class FamilySqliteManager: BaseSqliteManager<FamilyContract.Presenter>(), Family
     }
 
     override suspend fun getFriends(group: MyGroup): List<MyFriend> {
-        val result: List<MyFriend> = myFriendDao.getFriendsFromGroup(group.firebaseKey)?.mapNotNull { it } ?: emptyList()
-        return result
+        return myFriendDao.getFriendsFromGroup(group.groupFirebaseKey)?.mapNotNull { it } ?: emptyList()
     }
 
     override suspend fun addSentInvitationToSqlite(invitation: Invitation) {
@@ -107,7 +105,7 @@ class FamilySqliteManager: BaseSqliteManager<FamilyContract.Presenter>(), Family
                 myFriend.userFirebaseKey = it.first
                 myFriend.name = it.second
                 myFriend.email = it.second
-                myFriend.groupFirebaseKey = group.firebaseKey
+                myFriend.groupFirebaseKey = group.groupFirebaseKey
                 myFriendDao.insert(myFriend)
             }
     }

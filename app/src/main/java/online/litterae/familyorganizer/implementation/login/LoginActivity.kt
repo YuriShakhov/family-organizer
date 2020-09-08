@@ -33,11 +33,11 @@ class LoginActivity : BaseCompatActivity(), LoginContract.View, View.OnClickList
         when (v!!.id) {
             R.id.login -> {
                 loading.visibility = View.VISIBLE
-                presenter.signIn(username.getText().toString(), password.getText().toString())
+                presenter.signIn(username.text.toString(), password.text.toString())
             }
             R.id.register -> {
                 loading.visibility = View.VISIBLE
-                presenter.register(username.getText().toString(), password.getText().toString())
+                presenter.register(username.text.toString(), password.text.toString())
             }
         }
     }

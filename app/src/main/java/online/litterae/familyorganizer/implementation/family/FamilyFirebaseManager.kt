@@ -1,9 +1,8 @@
 package online.litterae.familyorganizer.implementation.family
 
-import android.util.Log
 import com.google.firebase.database.*
 import online.litterae.familyorganizer.abstracts.firebase.BaseFirebaseManager
-import online.litterae.familyorganizer.application.Const
+import online.litterae.familyorganizer.application.Const.Companion.ERROR_INVITATION_ALREADY_SENT
 import online.litterae.familyorganizer.application.Const.Companion.GROUP_NAME
 import online.litterae.familyorganizer.application.Const.Companion.INVITATION_STATUS
 import online.litterae.familyorganizer.application.Const.Companion.STATUS_NEW
@@ -13,18 +12,17 @@ import online.litterae.familyorganizer.application.Const.Companion.STATUS_DECLIN
 import online.litterae.familyorganizer.application.Const.Companion.TABLE_GROUPS
 import online.litterae.familyorganizer.application.Const.Companion.TABLE_INVITATIONS
 import online.litterae.familyorganizer.application.Const.Companion.TABLE_USERS
-import online.litterae.familyorganizer.application.Const.Companion.TAG
 import online.litterae.familyorganizer.application.MainApplication
 import online.litterae.familyorganizer.firebase.FirebaseGroup
 import online.litterae.familyorganizer.firebase.Invitation
 import online.litterae.familyorganizer.sqlite.MyGroup
-import java.lang.Exception
 
 class FamilyFirebaseManager: BaseFirebaseManager<FamilyContract.Presenter>(), FamilyContract.FirebaseManager {
     lateinit var invitationsRef: DatabaseReference
-    lateinit var groupRef: DatabaseReference
+    private lateinit var groupRef: DatabaseReference
+
     /*
-    Variable seenInvitationKey keeps firebase key of the last seen invitation
+    Keeps firebase key of the last seen invitation
     and thus helps to avoid processing the same invitation twice
      */
     var seenInvitationKey: String? = null
@@ -36,7 +34,7 @@ class FamilyFirebaseManager: BaseFirebaseManager<FamilyContract.Presenter>(), Fa
             override fun onChildAdded(dataSnapshot: DataSnapshot, previousChildName: String?) {
                 val invited = dataSnapshot.child(INVITED_EMAIL).value as String?
                 val status = dataSnapshot.child(INVITATION_STATUS).value as String?
-                if (invited == null || invited != email.toString()
+                if (invited == null || invited != myEmail.toString()
                     || status == null || status != STATUS_NEW
                 ) return
 
@@ -72,7 +70,7 @@ class FamilyFirebaseManager: BaseFirebaseManager<FamilyContract.Presenter>(), Fa
     }
 
     override fun addGroupToFirebase(name: String): String? {
-        val groupFirebaseKey = dbReference.child(TABLE_GROUPS).push().getKey()
+        val groupFirebaseKey = dbReference.child(TABLE_GROUPS).push().key
         dbReference.updateChildren(
             mapOf<String, Any>(
                 "/${TABLE_GROUPS}/$groupFirebaseKey"
@@ -86,9 +84,9 @@ class FamilyFirebaseManager: BaseFirebaseManager<FamilyContract.Presenter>(), Fa
     override fun addMeToFirebaseGroupUsers(groupName: String, groupFirebaseKey: String) {
         dbReference.updateChildren(
             mapOf<String, Any>(
-                "/$TABLE_GROUPS/$groupFirebaseKey/users/$firebaseKey"
+                "/$TABLE_GROUPS/$groupFirebaseKey/users/$myFirebaseKey"
                         to
-                        email.toString()
+                        myEmail.toString()
             )
         )
     }
@@ -107,17 +105,20 @@ class FamilyFirebaseManager: BaseFirebaseManager<FamilyContract.Presenter>(), Fa
                     }
                 }
                 if (alreadySent) {
-                    presenter?.reportError("Invitation already sent.")
+                    presenter?.reportError(ERROR_INVITATION_ALREADY_SENT)
                 } else {
-                    invitation.senderEmail = email.toString()
-                    val invitationFirebaseKey = dbReference.child(TABLE_INVITATIONS).push().getKey()
+                    invitation.senderEmail = myEmail.toString()
+                    val invitationFirebaseKey = dbReference.child(TABLE_INVITATIONS).push().key
                     invitationFirebaseKey?.let {
                         invitation.invitationFirebaseKey = invitationFirebaseKey
                     }
-                    val insertInvitation = mutableMapOf<String, Any>()
-                    insertInvitation["/$TABLE_INVITATIONS/$invitationFirebaseKey"] =
-                        invitation.toMap()
-                    dbReference.updateChildren(insertInvitation)
+                    dbReference.updateChildren(
+                        mapOf<String, Any>(
+                            "/$TABLE_INVITATIONS/$invitationFirebaseKey"
+                                    to
+                                    invitation.toMap()
+                        )
+                    )
                     presenter?.reportSuccess("${invitation.invitedEmail} invited to group ${invitation.groupName}")
                     presenter?.onInvitationAddedToFirebase(invitation)
                 }
@@ -131,7 +132,7 @@ class FamilyFirebaseManager: BaseFirebaseManager<FamilyContract.Presenter>(), Fa
     }
 
     override fun subscribeToUpdates(myGroup: MyGroup) {
-        groupRef = dbReference.child(TABLE_GROUPS).child(myGroup.firebaseKey)
+        groupRef = dbReference.child(TABLE_GROUPS).child(myGroup.groupFirebaseKey)
         groupRef.child(TABLE_USERS).addValueEventListener(object : ValueEventListener {
             override fun onDataChange(snapshot: DataSnapshot) {
                 val friends = arrayListOf<Pair<String, String>>()

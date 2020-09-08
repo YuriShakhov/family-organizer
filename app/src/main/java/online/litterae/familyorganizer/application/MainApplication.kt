@@ -1,9 +1,7 @@
 package online.litterae.familyorganizer.application
 
 import android.app.Application
-import android.util.Log
 import androidx.room.Room
-import online.litterae.familyorganizer.application.Const.Companion.TAG
 import online.litterae.familyorganizer.dagger.AppComponent
 import online.litterae.familyorganizer.dagger.DaggerAppComponent
 import online.litterae.familyorganizer.dagger.PageComponent
@@ -13,17 +11,17 @@ class MainApplication: Application() {
     override fun onCreate() {
         super.onCreate()
         mainApplication = this
-        mainComponent = initDagger(this)
+        mainComponent = initDagger()
     }
 
-    private fun initDagger (app: MainApplication) : AppComponent =
+    private fun initDagger(): AppComponent =
         DaggerAppComponent.create()
 
     companion object {
         lateinit var mainApplication: MainApplication
         lateinit var mainComponent: AppComponent
-        var pageComponent: PageComponent? = null
-        val databases: MutableMap<String, MyDatabase> = HashMap()
+        private var pageComponent: PageComponent? = null
+        private val databases: MutableMap<String, MyDatabase> = HashMap()
 
         fun getApplication() : MainApplication =
             mainApplication
@@ -44,14 +42,14 @@ class MainApplication: Application() {
 
         fun getDatabase(myEmail: String) : MyDatabase {
             val myDatabase = databases[myEmail]
-            if (myDatabase != null) {
-                return myDatabase
+            return if (myDatabase != null) {
+                myDatabase
             } else {
                 val newDatabase: MyDatabase = Room
                     .databaseBuilder(getApplication(), MyDatabase::class.java, myEmail)
                     .build()
                 databases[myEmail] = newDatabase
-                return newDatabase
+                newDatabase
             }
         }
     }

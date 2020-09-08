@@ -6,9 +6,8 @@ import online.litterae.familyorganizer.application.MainApplication
 class NotesPresenter: PagePresenter<NotesContract.View>(), NotesContract.Presenter {
     override fun init() {
         MainApplication.createPageComponent().inject(this)
-        super.init()
     }
 
-    override fun setNotifications(number: Int) {
+    override fun setNotifications(count: Int) {
     }
 }

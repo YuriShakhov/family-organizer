@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 @Entity
 class MyGroup {
     @PrimaryKey
-    var firebaseKey = ""
+    var groupFirebaseKey = ""
     var name = ""
     var iAmAdmin = 0
     var myCurrentGroup = 0

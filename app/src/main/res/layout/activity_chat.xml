@@ -9,29 +9,49 @@
     android:id="@+id/linearLayout"
     android:backgroundTint="#e0e0ff">
 
-    <TextView
-        android:id="@+id/tv_friend_name"
+    <LinearLayout
+        android:id="@+id/layout_friend"
+        android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintVertical_weight="2"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_margin="10dp"
+        android:layout_margin="16dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:text="Default friend name"
-        android:textSize="12sp"/>
+        app:layout_constraintVertical_weight="2"
+        >
+
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginRight="12dp"
+            android:src="@drawable/ic_user"
+            />
+
+        <TextView
+            android:id="@+id/tv_friend_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="Default friend name"
+            android:textSize="16sp"/>
+
+    </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_messages"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintVertical_weight="1"
-        app:layout_constraintTop_toBottomOf="@id/tv_friend_name"
+        app:layout_constraintTop_toBottomOf="@id/layout_friend"
+        app:layout_constraintBottom_toTopOf="@id/layout_input"
         android:layout_margin="10dp"
         android:background="@android:color/transparent"
+        android:paddingBottom="8dp"
         />
 
     <LinearLayout
+        android:id="@+id/layout_input"
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

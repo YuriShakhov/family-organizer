@@ -10,13 +10,11 @@ import javax.inject.Inject
 
 abstract class PagePresenter<V: BaseViewInterface> : BasePresenter<V>() {
     @Inject
-    lateinit var email: Email
+    lateinit var myEmail: Email
     @Inject
-    lateinit var firebaseKey: FirebaseKey
+    lateinit var myFirebaseKey: FirebaseKey
     @Inject
     lateinit var notificationsHolder: NotificationsHolder
-
-    override fun init() {}
 
     abstract fun setNotifications(count: Int)
 

@@ -16,28 +16,28 @@ abstract class PageActivity : BaseCompatActivity() {
             when(item.itemId) {
                 R.id.page_planner -> {
                     if (this !is PlannerActivity) {
-                        val intent: Intent = Intent(this, PlannerActivity::class.java)
+                        val intent = Intent(this, PlannerActivity::class.java)
                         startActivity(intent)
                     }
                     true
                 }
                 R.id.page_shopping -> {
                     if (this !is ShoppingActivity) {
-                        val intent: Intent = Intent(this, ShoppingActivity::class.java)
+                        val intent = Intent(this, ShoppingActivity::class.java)
                         startActivity(intent)
                     }
                     true
                 }
                 R.id.page_family -> {
                     if (this !is FamilyActivity) {
-                        val intent: Intent = Intent(this, FamilyActivity::class.java)
+                        val intent = Intent(this, FamilyActivity::class.java)
                         startActivity(intent)
                     }
                     true
                 }
                 R.id.page_notes -> {
                     if (this !is NotesActivity) {
-                        val intent: Intent = Intent(this, NotesActivity::class.java)
+                        val intent = Intent(this, NotesActivity::class.java)
                         startActivity(intent)
                     }
                     true

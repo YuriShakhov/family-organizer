@@ -3,7 +3,7 @@ package online.litterae.familyorganizer.implementation.notifications
 import online.litterae.familyorganizer.application.Const.Companion.STATUS_NEW
 import online.litterae.familyorganizer.firebase.Invitation
 
-sealed class Notification () {
+sealed class Notification {
     var shortMessage: String = ""
     var status: String = STATUS_NEW
 }

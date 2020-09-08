@@ -1,15 +1,10 @@
 package online.litterae.familyorganizer.sqlite
 
-import com.google.gson.Gson
 import dagger.Module
 import dagger.Provides
 import online.litterae.familyorganizer.application.MainApplication
 import online.litterae.familyorganizer.dagger.PageScope
 import online.litterae.familyorganizer.firebase.Email
-import online.litterae.familyorganizer.implementation.notifications.NotificationsHolder
-import online.litterae.familyorganizer.implementation.notifications.ReceivedInvitationNotification
-import online.litterae.familyorganizer.implementation.notifications.ReceivedMessageNotification
-import online.litterae.familyorganizer.implementation.notifications.ReplyToInvitationNotification
 
 @Module
 class SQLiteModule {

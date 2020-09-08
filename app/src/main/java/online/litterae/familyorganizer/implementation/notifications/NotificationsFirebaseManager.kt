@@ -1,16 +1,13 @@
 package online.litterae.familyorganizer.implementation.notifications
 
-import android.util.Log
 import online.litterae.familyorganizer.abstracts.firebase.BaseFirebaseManager
 import online.litterae.familyorganizer.application.Const.Companion.STATUS_ACCEPTED
 import online.litterae.familyorganizer.application.Const.Companion.STATUS_DECLINED
 import online.litterae.familyorganizer.application.Const.Companion.TABLE_GROUPS
 import online.litterae.familyorganizer.application.Const.Companion.TABLE_INVITATIONS
 import online.litterae.familyorganizer.application.Const.Companion.TABLE_USERS
-import online.litterae.familyorganizer.application.Const.Companion.TAG
 import online.litterae.familyorganizer.application.MainApplication
 import online.litterae.familyorganizer.firebase.Invitation
-import java.lang.Exception
 
 class NotificationsFirebaseManager : BaseFirebaseManager<NotificationsContract.Presenter>(), NotificationsContract.FirebaseManager {
     override fun init() {
@@ -20,9 +17,9 @@ class NotificationsFirebaseManager : BaseFirebaseManager<NotificationsContract.P
     override fun addMeToFireBaseGroup(invitation: Invitation) {
         dbReference.updateChildren(
             mapOf<String, String>(
-                "/$TABLE_GROUPS/${invitation.groupFirebaseKey}/$TABLE_USERS/${firebaseKey}"
+                "/$TABLE_GROUPS/${invitation.groupFirebaseKey}/$TABLE_USERS/${myFirebaseKey}"
                         to
-                        email.toString()
+                        myEmail.toString()
             )
         )
     }

@@ -1,16 +1,8 @@
 package online.litterae.familyorganizer.implementation.notifications
 
-import android.util.Log
 import dagger.Module
 import dagger.Provides
 import online.litterae.familyorganizer.dagger.PageScope
-import online.litterae.familyorganizer.implementation.family.FamilyContract
-import online.litterae.familyorganizer.implementation.family.FamilyFirebaseManager
-import online.litterae.familyorganizer.implementation.family.FamilyPresenter
-import online.litterae.familyorganizer.implementation.family.FamilySqliteManager
-import online.litterae.familyorganizer.sqlite.MyGroupDao
-import online.litterae.familyorganizer.sqlite.MyNotificationDao
-import javax.inject.Inject
 
 @Module
 class NotificationsModule {
@@ -20,7 +12,11 @@ class NotificationsModule {
 
     @PageScope
     @Provides
-    fun provideNotificationsPresenter() : NotificationsContract.Presenter = NotificationsPresenter()
+    fun provideNotificationsPresenter() : NotificationsContract.Presenter {
+        val presenter = NotificationsPresenter()
+        presenter.init()
+        return presenter
+    }
 
     @PageScope
     @Provides

@@ -1,19 +1,18 @@
 package online.litterae.familyorganizer.implementation.notifications
 
-import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import online.litterae.familyorganizer.abstracts.sqlite.BaseSqliteManager
 import online.litterae.familyorganizer.application.Const.Companion.STATUS_ACCEPTED
 import online.litterae.familyorganizer.application.Const.Companion.STATUS_DECLINED
-import online.litterae.familyorganizer.application.Const.Companion.TAG
 import online.litterae.familyorganizer.application.MainApplication
 import online.litterae.familyorganizer.firebase.Invitation
 import online.litterae.familyorganizer.sqlite.MyGroup
 import online.litterae.familyorganizer.sqlite.MyReceivedInvitation
 
-class NotificationsSqliteManager : BaseSqliteManager<NotificationsContract.Presenter>(), NotificationsContract.SqliteManager {
+class NotificationsSqliteManager
+    : BaseSqliteManager<NotificationsContract.Presenter>(), NotificationsContract.SqliteManager {
     override fun init() {
         MainApplication.createPageComponent().inject(this)
     }
@@ -22,7 +21,7 @@ class NotificationsSqliteManager : BaseSqliteManager<NotificationsContract.Prese
         CoroutineScope(Dispatchers.Default).launch {
             val myGroup = MyGroup()
             myGroup.name = invitation.groupName
-            myGroup.firebaseKey = invitation.groupFirebaseKey
+            myGroup.groupFirebaseKey = invitation.groupFirebaseKey
             myGroupDao.insert(myGroup)
         }
     }

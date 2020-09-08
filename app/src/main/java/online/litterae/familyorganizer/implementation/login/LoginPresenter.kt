@@ -5,6 +5,9 @@ import android.content.SharedPreferences
 import online.litterae.familyorganizer.application.MainApplication
 import online.litterae.familyorganizer.abstracts.presenter.BasePresenter
 import online.litterae.familyorganizer.application.Const
+import online.litterae.familyorganizer.application.Const.Companion.ERROR_AUTHORIZATION_FAILED
+import online.litterae.familyorganizer.application.Const.Companion.ERROR_CREATE_PROFILE
+import online.litterae.familyorganizer.application.Const.Companion.ERROR_REGISTRATION_FAILED
 import online.litterae.familyorganizer.firebase.FirebaseProfile
 import java.util.HashMap
 
@@ -25,7 +28,7 @@ class LoginPresenter : BasePresenter<LoginContract.View>(), LoginContract.Presen
                 if (task.isSuccessful) {
                     view?.enter()
                 } else {
-                    view?.showErrorMessage("Authorization failed")
+                    view?.showErrorMessage(ERROR_AUTHORIZATION_FAILED)
                 }
         }
     }
@@ -37,13 +40,13 @@ class LoginPresenter : BasePresenter<LoginContract.View>(), LoginContract.Presen
                     createProfile(email)
                     view?.enter()
                 } else {
-                    view?.showErrorMessage("Registration failed")
+                    view?.showErrorMessage(ERROR_REGISTRATION_FAILED)
                 }
             }
     }
 
-    fun createProfile (email: String) {
-        val key: String? = dbReference.child(Const.TABLE_PROFILES).push().getKey()
+    private fun createProfile (email: String) {
+        val key: String? = dbReference.child(Const.TABLE_PROFILES).push().key
         if (key != null) {
             val profileMap: Map<String, Any> = FirebaseProfile(email).toMap()
             val insertProfile: MutableMap<String, Any> = HashMap()
@@ -51,11 +54,11 @@ class LoginPresenter : BasePresenter<LoginContract.View>(), LoginContract.Presen
             dbReference.updateChildren(insertProfile)
             saveMyFirebaseKeyToSharedPrefs(key, email)
         } else {
-            view?.showErrorMessage("Firebase error: couldn't get database key for new profile")
+            view?.showErrorMessage(ERROR_CREATE_PROFILE)
         }
     }
 
-    fun saveMyFirebaseKeyToSharedPrefs(key: String, email: String) {
+    private fun saveMyFirebaseKeyToSharedPrefs(key: String, email: String) {
         val preferences: SharedPreferences = MainApplication.getApplication().getSharedPreferences(
             Const.APP_PREFERENCES, Context.MODE_PRIVATE)
         val editor = preferences.edit()

@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-class MyFriend () {
+class MyFriend {
     @PrimaryKey
     var userFirebaseKey = ""
     var email = ""

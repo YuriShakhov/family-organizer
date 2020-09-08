@@ -25,7 +25,6 @@ abstract class BaseSqliteManager<P: BasePresenterInterface<out BaseViewInterface
         private set
 
     override fun attach(presenter: P) {
-        init()
         this.presenter = presenter
     }
 }

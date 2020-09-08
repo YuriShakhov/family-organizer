@@ -2,6 +2,7 @@ package online.litterae.familyorganizer.dagger
 
 import dagger.Subcomponent
 import online.litterae.familyorganizer.implementation.family.*
+import online.litterae.familyorganizer.implementation.groupchat.GroupChatModule
 import online.litterae.familyorganizer.implementation.notes.NotesActivity
 import online.litterae.familyorganizer.implementation.notes.NotesModule
 import online.litterae.familyorganizer.implementation.notes.NotesPresenter
@@ -26,6 +27,7 @@ import online.litterae.familyorganizer.sqlite.SQLiteModule
 ])
 interface PageComponent {
     fun createSingleChatComponent(chatModule: ChatModule) : SingleChatComponent
+    fun createGroupChatComponent(groupChatModule: GroupChatModule) : GroupChatComponent
 
     fun inject(target: FamilyActivity)
     fun inject(target: FamilyPresenter)

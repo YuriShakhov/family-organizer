@@ -2,7 +2,6 @@ package online.litterae.familyorganizer.dagger
 
 import dagger.Subcomponent
 import online.litterae.familyorganizer.implementation.singlechat.*
-import online.litterae.familyorganizer.sqlite.SQLiteModule
 
 @SingleChatScope
 @Subcomponent(modules = [ChatModule::class])

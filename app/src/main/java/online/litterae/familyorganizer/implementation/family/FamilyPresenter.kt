@@ -1,6 +1,5 @@
 package online.litterae.familyorganizer.implementation.family
 
-import android.util.Log
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Default
 import kotlinx.coroutines.Dispatchers.Main
@@ -9,10 +8,8 @@ import online.litterae.familyorganizer.abstracts.presenter.PagePresenter
 import online.litterae.familyorganizer.application.Const.Companion.ERROR_INSERT_GROUP
 import online.litterae.familyorganizer.application.Const.Companion.ERROR_SEND_INVITATION
 import online.litterae.familyorganizer.application.Const.Companion.INVITATION_KEY_DEFAULT
-import online.litterae.familyorganizer.application.Const.Companion.TAG
 import online.litterae.familyorganizer.firebase.Invitation
 import online.litterae.familyorganizer.implementation.notifications.ReceivedInvitationNotification
-import online.litterae.familyorganizer.sqlite.MyFriend
 import online.litterae.familyorganizer.sqlite.MyGroup
 import javax.inject.Inject
 
@@ -26,7 +23,6 @@ class FamilyPresenter : PagePresenter<FamilyContract.View>(), FamilyContract.Pre
         sqliteManager.attach(this)
         firebaseManager.attach(this)
         notificationsHolder.attach(this)
-        super.init()
     }
 
     override fun setDataInView() {
@@ -34,7 +30,7 @@ class FamilyPresenter : PagePresenter<FamilyContract.View>(), FamilyContract.Pre
         setNotificationsCount()
     }
 
-    fun setCurrentGroupInView() {
+    private fun setCurrentGroupInView() {
         CoroutineScope(Default).launch {
             val currentGroup = getCurrentGroup()
             val myGroup = currentGroup.first
@@ -49,7 +45,7 @@ class FamilyPresenter : PagePresenter<FamilyContract.View>(), FamilyContract.Pre
         }
     }
     
-    fun setFriendsInView(group: MyGroup) {
+    private fun setFriendsInView(group: MyGroup) {
         CoroutineScope(Default).launch {
             val friends = sqliteManager.getFriends(group)
             withContext(Main) {
@@ -69,7 +65,7 @@ class FamilyPresenter : PagePresenter<FamilyContract.View>(), FamilyContract.Pre
         return Pair(myGroup, isMyModeratedGroup)
     }
 
-    fun setNotificationsCount() {
+    private fun setNotificationsCount() {
         val count = notificationsHolder.getNewNotificationsCount()
         setNotifications(count)
     }
@@ -77,7 +73,7 @@ class FamilyPresenter : PagePresenter<FamilyContract.View>(), FamilyContract.Pre
     override fun changeCurrentGroup(myGroup: MyGroup) {
         CoroutineScope(Default).launch{
             launch {
-                sqliteManager.setGroupAsCurrent(myGroup.firebaseKey)
+                sqliteManager.setGroupAsCurrent(myGroup.groupFirebaseKey)
             }.join()
             withContext(Main) {
                 setDataInView()
@@ -114,7 +110,7 @@ class FamilyPresenter : PagePresenter<FamilyContract.View>(), FamilyContract.Pre
 
     override fun sendInvitation(myGroup: MyGroup, invitedEmail: String, message: String) {
         if (invitedEmail.contains("@")) {
-            val invitation = Invitation(myGroup.firebaseKey, myGroup.name, invitedEmail, message)
+            val invitation = Invitation(myGroup.groupFirebaseKey, myGroup.name, invitedEmail, message)
             firebaseManager.addInvitationToFirebase(invitation)
         } else {
             reportError("Please enter email")
@@ -142,9 +138,9 @@ class FamilyPresenter : PagePresenter<FamilyContract.View>(), FamilyContract.Pre
                             = currentFriends.map { it.userFirebaseKey }
                     val newFriendsIds: List<String>
                             = newFriends.map { it.first }
-                    if (!currentFriendsIds.equals(newFriendsIds)) {
+                    if (currentFriendsIds != newFriendsIds) {
                         launch {
-                            sqliteManager.updateFriends(myCurrentGroup, currentFriends, newFriends, firebaseKey.toString())
+                            sqliteManager.updateFriends(myCurrentGroup, currentFriends, newFriends, myFirebaseKey.toString())
                         }.join()
                         setFriendsInView(myCurrentGroup)
                     }
@@ -172,5 +168,5 @@ class FamilyPresenter : PagePresenter<FamilyContract.View>(), FamilyContract.Pre
         view?.showNotifications(count)
     }
 
-    override fun getEmail(): String = email.toString()
+    override fun getEmail(): String = myEmail.toString()
 }

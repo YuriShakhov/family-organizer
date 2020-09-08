@@ -8,5 +8,9 @@ import online.litterae.familyorganizer.dagger.PageScope
 class NotesModule {
     @PageScope
     @Provides
-    fun provideNotesPresenter(): NotesContract.Presenter = NotesPresenter()
+    fun provideNotesPresenter(): NotesContract.Presenter {
+        val presenter = NotesPresenter()
+        presenter.init()
+        return presenter
+    }
 }

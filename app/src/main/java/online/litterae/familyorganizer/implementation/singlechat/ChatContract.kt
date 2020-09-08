@@ -4,10 +4,6 @@ import online.litterae.familyorganizer.abstracts.firebase.BaseFirebaseManagerInt
 import online.litterae.familyorganizer.abstracts.presenter.BasePresenterInterface
 import online.litterae.familyorganizer.abstracts.sqlite.BaseSqliteManagerInterface
 import online.litterae.familyorganizer.abstracts.view.BaseViewInterface
-import online.litterae.familyorganizer.firebase.Invitation
-import online.litterae.familyorganizer.implementation.notifications.Notification
-import online.litterae.familyorganizer.implementation.notifications.NotificationsContract
-import online.litterae.familyorganizer.implementation.notifications.ReceivedInvitationNotification
 import online.litterae.familyorganizer.sqlite.MyFriend
 import java.util.*
 
@@ -15,7 +11,7 @@ interface ChatContract {
     interface View: BaseViewInterface {
         fun getFriendFromIntent(): MyFriend
         fun showFriend(myFriend: MyFriend)
-        fun showMessages(messages: List<Message>, myFirebaseKey: String, friendFirebaseKey: String)
+        fun showMessages(messages: List<Message>, myFirebaseKey: String, myFriend: MyFriend)
     }
 
     interface Presenter: BasePresenterInterface<ChatContract.View> {
@@ -28,8 +24,8 @@ interface ChatContract {
     }
 
     interface SqliteManager: BaseSqliteManagerInterface<ChatContract.Presenter> {
-        suspend fun getMessages(myFriend: MyFriend): List<Message>
-        suspend fun updateMessages(myFriend: MyFriend, messages: List<Message>)
+        suspend fun getMessages(): List<Message>
+        suspend fun updateMessages(messages: List<Message>)
     }
 
     interface FirebaseManager: BaseFirebaseManagerInterface<ChatContract.Presenter> {

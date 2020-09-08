@@ -7,8 +7,6 @@ import online.litterae.familyorganizer.R
 import online.litterae.familyorganizer.abstracts.view.PageActivity
 import javax.inject.Inject
 
-const val TAG = "MyTag"
-
 class PlannerActivity : PageActivity(), PlannerContract.View {
     @Inject lateinit var presenter: PlannerContract.Presenter
 

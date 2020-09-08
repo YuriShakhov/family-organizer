@@ -6,7 +6,6 @@ import online.litterae.familyorganizer.application.MainApplication
 class ShoppingPresenter: PagePresenter<ShoppingContract.View>(), ShoppingContract.Presenter {
     override fun init() {
         MainApplication.createPageComponent().inject(this)
-        super.init()
     }
 
     override fun setNotifications(count: Int) {

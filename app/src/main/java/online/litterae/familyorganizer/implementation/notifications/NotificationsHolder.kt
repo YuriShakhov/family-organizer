@@ -1,25 +1,19 @@
 package online.litterae.familyorganizer.implementation.notifications
 
-import android.util.Log
 import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import online.litterae.familyorganizer.abstracts.presenter.PagePresenter
 import online.litterae.familyorganizer.abstracts.view.BaseViewInterface
-import online.litterae.familyorganizer.abstracts.view.PageActivity
-import online.litterae.familyorganizer.application.Const
 import online.litterae.familyorganizer.application.Const.Companion.STATUS_ACCEPTED
 import online.litterae.familyorganizer.application.Const.Companion.STATUS_DECLINED
 import online.litterae.familyorganizer.application.Const.Companion.STATUS_NEW
-import online.litterae.familyorganizer.application.Const.Companion.TAG
 import online.litterae.familyorganizer.application.MainApplication
-import online.litterae.familyorganizer.implementation.family.FamilyContract
 import online.litterae.familyorganizer.implementation.family.FamilyPresenter
 import online.litterae.familyorganizer.implementation.notes.NotesPresenter
 import online.litterae.familyorganizer.implementation.planner.PlannerPresenter
 import online.litterae.familyorganizer.implementation.shopping.ShoppingPresenter
-import online.litterae.familyorganizer.sqlite.MyNotification
 import online.litterae.familyorganizer.sqlite.MyNotificationDao
 import javax.inject.Inject
 
@@ -28,13 +22,14 @@ const val NOTES_PRESENTER = "NotesPresenter"
 const val PLANNER_PRESENTER = "PlannerPresenter"
 const val SHOPING_PRESENTER = "ShoppingPresenter"
 
-class NotificationsHolder () {
+class NotificationsHolder {
     var notificationsList: ArrayList<Notification> = ArrayList()
-    var familyPresenter: FamilyPresenter? = null
-    var notesPresenter: NotesPresenter? = null
-    var plannerPresenter: PlannerPresenter? = null
-    var shoppingPresenter: ShoppingPresenter? = null
-    val presenters = mutableMapOf(
+
+    private var familyPresenter: FamilyPresenter? = null
+    private var notesPresenter: NotesPresenter? = null
+    private var plannerPresenter: PlannerPresenter? = null
+    private var shoppingPresenter: ShoppingPresenter? = null
+    private val presenters = mutableMapOf(
         FAMILY_PRESENTER to familyPresenter,
         NOTES_PRESENTER to notesPresenter,
         PLANNER_PRESENTER to plannerPresenter,
@@ -86,11 +81,11 @@ class NotificationsHolder () {
 
     fun changeNotificationStatusToAccepted(notification: ReceivedInvitationNotification) {
         notification.status = STATUS_ACCEPTED
-        notificationsList.set(notificationsList.indexOf(notification), notification)
+        notificationsList[notificationsList.indexOf(notification)] = notification
     }
 
     fun changeNotificationStatusToDeclined(notification: ReceivedInvitationNotification) {
         notification.status = STATUS_DECLINED
-        notificationsList.set(notificationsList.indexOf(notification), notification)
+        notificationsList[notificationsList.indexOf(notification)] = notification
     }
 }

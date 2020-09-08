@@ -3,7 +3,6 @@ package online.litterae.familyorganizer.implementation.family
 import android.content.Intent
 import android.graphics.drawable.LayerDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
@@ -17,13 +16,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import online.litterae.familyorganizer.application.MainApplication
-import online.litterae.familyorganizer.application.Const.Companion.TAG
 import online.litterae.familyorganizer.R
 import online.litterae.familyorganizer.abstracts.view.PageActivity
-import online.litterae.familyorganizer.application.Const.Companion.CANCEL_DIALOG
-import online.litterae.familyorganizer.application.Const.Companion.CHOOSE_GROUP_DIALOG
+import online.litterae.familyorganizer.application.Const.Companion.DIALOG_CANCEL
+import online.litterae.familyorganizer.application.Const.Companion.DIALOG_CHOOSE_GROUP
+import online.litterae.familyorganizer.application.Const.Companion.DIALOG_CREATE
+import online.litterae.familyorganizer.application.Const.Companion.DIALOG_ENTER_EMAIL
+import online.litterae.familyorganizer.application.Const.Companion.DIALOG_ENTER_GROUP_NAME
 import online.litterae.familyorganizer.application.Const.Companion.KEY_MY_FRIEND
-import online.litterae.familyorganizer.application.Const.Companion.OK_DIALOG
+import online.litterae.familyorganizer.application.Const.Companion.KEY_MY_GROUP
+import online.litterae.familyorganizer.application.Const.Companion.DIALOG_OK
+import online.litterae.familyorganizer.application.Const.Companion.DIALOG_SEND
+import online.litterae.familyorganizer.application.Const.Companion.DIALOG_WRITE_MESSAGE
 import online.litterae.familyorganizer.implementation.groupchat.GroupChatActivity
 import online.litterae.familyorganizer.implementation.notifications.CountDrawable
 import online.litterae.familyorganizer.implementation.notifications.NotificationsActivity
@@ -36,9 +40,10 @@ class FamilyActivity : PageActivity(), FamilyContract.View {
 
     @Inject lateinit var presenter : FamilyContract.Presenter
 
+    private lateinit var adapter: FriendAdapter
+    private lateinit var toolBarMenu: Menu
+
     var friendsList: List<MyFriend> = ArrayList()
-    lateinit var adapter: FriendAdapter
-    lateinit var toolBarMenu: Menu
 
     override fun init(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_family)
@@ -57,32 +62,32 @@ class FamilyActivity : PageActivity(), FamilyContract.View {
     private fun setRecyclerView () {
         val usersRecycler : RecyclerView = findViewById(R.id.rv_users)
         usersRecycler.setHasFixedSize(true)
-        usersRecycler.setLayoutManager(LinearLayoutManager(this))
+        usersRecycler.layoutManager = LinearLayoutManager(this)
         adapter = FriendAdapter()
-        usersRecycler.setAdapter(adapter)
+        usersRecycler.adapter = adapter
     }
 
     override fun setSelectedItem(bottomMenu: BottomNavigationView) {
         bottomMenu.selectedItemId = R.id.page_family
     }
 
-    fun notificationsMenu(menuItem: MenuItem) {
+    fun notificationsMenu(item: MenuItem) {
         startActivity(Intent(this, NotificationsActivity::class.java))
     }
 
-    fun chooseGroupMenu(menuItem: MenuItem) {
+    fun chooseGroupMenu(item: MenuItem) {
         presenter.getGroupsList()
     }
 
     fun createGroupMenu(item: MenuItem) {
         val editGroupName = EditText(this)
         AlertDialog.Builder(this)
-            .setTitle("Enter group name:")
+            .setTitle(DIALOG_ENTER_GROUP_NAME)
             .setView(editGroupName)
-            .setPositiveButton("Create") {dialog, which ->
-                presenter.createGroup(editGroupName.getText().toString())
+            .setPositiveButton(DIALOG_CREATE) { _, _ ->
+                presenter.createGroup(editGroupName.text.toString())
             }
-            .setNegativeButton("Cancel") {dialog, which ->}
+            .setNegativeButton(DIALOG_CANCEL) { _, _ ->}
             .create()
             .show()
     }
@@ -93,9 +98,9 @@ class FamilyActivity : PageActivity(), FamilyContract.View {
             currentGroup?.let {
                 val groupName = it.name
                 val editEmail = EditText(this@FamilyActivity)
-                editEmail.hint = "Enter email"
+                editEmail.hint = DIALOG_ENTER_EMAIL
                 val editMessage = EditText(this@FamilyActivity)
-                editMessage.hint = "Write a message"
+                editMessage.hint = DIALOG_WRITE_MESSAGE
                 val layout = LinearLayout(this@FamilyActivity)
                 layout.orientation = LinearLayout.VERTICAL
                 layout.addView(editEmail)
@@ -104,10 +109,10 @@ class FamilyActivity : PageActivity(), FamilyContract.View {
                     AlertDialog.Builder(this@FamilyActivity)
                         .setTitle("Invite a new member to group $groupName")
                         .setView(layout)
-                        .setPositiveButton("Send") {dialog, which ->
+                        .setPositiveButton(DIALOG_SEND) { _, _ ->
                             presenter.sendInvitation(it, editEmail.text.toString(), editMessage.text.toString())
                         }
-                        .setNegativeButton(CANCEL_DIALOG, null)
+                        .setNegativeButton(DIALOG_CANCEL, null)
                         .create()
                         .show()
                 }
@@ -133,10 +138,12 @@ class FamilyActivity : PageActivity(), FamilyContract.View {
             groupIndex++
         }
         AlertDialog.Builder(this)
-            .setTitle(CHOOSE_GROUP_DIALOG)
-            .setSingleChoiceItems(groupsNamesList.toTypedArray(), groupIndex, { _, which -> groupIndex = which})
-            .setPositiveButton(OK_DIALOG, { _, which -> presenter.changeCurrentGroup(groups[groupIndex])})
-            .setNegativeButton(CANCEL_DIALOG, null)
+            .setTitle(DIALOG_CHOOSE_GROUP)
+            .setSingleChoiceItems(groupsNamesList.toTypedArray(), groupIndex) { _, which ->
+                groupIndex = which
+            }
+            .setPositiveButton(DIALOG_OK) { _, _ -> presenter.changeCurrentGroup(groups[groupIndex]) }
+            .setNegativeButton(DIALOG_CANCEL, null)
             .create()
             .show()
     }
@@ -148,16 +155,17 @@ class FamilyActivity : PageActivity(), FamilyContract.View {
         badge.setCount(count.toString())
         icon.mutate()
         icon.setDrawableByLayerId(R.id.ic_notifications_count, badge)
-        notificationsMenuItem.setIcon(icon)
+        notificationsMenuItem.icon = icon
     }
 
     override fun showCurrentGroup(group: MyGroup?, isMyModeratedGroup: Boolean) {
         val groupName = group?.name
         groupName?.let {
-            tvGroupName.setText(groupName)
+            tvGroupName.text = groupName
             tvGroupName.setOnClickListener{
                 val groupChatIntent = Intent(this@FamilyActivity, GroupChatActivity::class.java)
-                groupChatIntent.putExtra("groupName", groupName)
+                val myGroup = Gson().toJson(group)
+                groupChatIntent.putExtra(KEY_MY_GROUP, myGroup)
                 startActivity(groupChatIntent)
             }
             tvGroupName.setOnLongClickListener{
@@ -170,7 +178,7 @@ class FamilyActivity : PageActivity(), FamilyContract.View {
         }
         if (isMyModeratedGroup) {
             val inviteMenuItem = toolBarMenu.findItem(R.id.mi_invite)
-            inviteMenuItem.setVisible(true)
+            inviteMenuItem.isVisible = true
         }
     }
 
@@ -191,7 +199,7 @@ class FamilyActivity : PageActivity(), FamilyContract.View {
         override fun onBindViewHolder(holder: FriendViewHolder, position: Int) {
             val friend = friendsList[position]
             val friendName = friend.name
-            holder.userName.setText(friendName)
+            holder.userName.text = friendName
             holder.userLayout.setOnClickListener{
                 val chatIntent = Intent(this@FamilyActivity, ChatActivity::class.java)
                 val myFriendJson = Gson().toJson(friend)

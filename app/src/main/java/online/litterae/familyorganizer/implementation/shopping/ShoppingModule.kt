@@ -8,5 +8,9 @@ import online.litterae.familyorganizer.dagger.PageScope
 class ShoppingModule {
     @PageScope
     @Provides
-    fun provideShoppingPresenter() : ShoppingContract.Presenter = ShoppingPresenter()
+    fun provideShoppingPresenter() : ShoppingContract.Presenter {
+        val presenter = ShoppingPresenter()
+        presenter.init()
+        return presenter
+    }
 }

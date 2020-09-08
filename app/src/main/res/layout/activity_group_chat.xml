@@ -4,17 +4,80 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".implementation.groupchat.GroupChatActivity">
+    android:orientation="vertical"
+    tools:context=".implementation.singlechat.ChatActivity"
+    android:id="@+id/linearLayout"
+    android:backgroundTint="#e0e0ff">
 
-    <TextView
-        android:id="@+id/tv_group_chat"
+    <LinearLayout
+        android:id="@+id/layout_group"
+        android:orientation="horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_margin="16dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        android:text="Chat activity"/>
+        app:layout_constraintVertical_weight="2"
+        >
 
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginRight="12dp"
+            android:src="@drawable/ic_group"
+            />
+
+        <TextView
+            android:id="@+id/tv_group_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="Default group name"
+            android:textSize="16sp"/>
+
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_messages"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintVertical_weight="1"
+        app:layout_constraintTop_toBottomOf="@id/layout_group"
+        app:layout_constraintBottom_toTopOf="@id/layout_input"
+        android:layout_margin="10dp"
+        android:background="@android:color/transparent"
+        android:paddingBottom="8dp"
+        />
+
+    <LinearLayout
+        android:id="@+id/layout_input"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        >
+
+        <EditText
+            android:id="@+id/et_message"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:hint="Enter your message"/>
+
+        <Button
+            android:id="@+id/b_send_message"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:textSize="12sp"
+            android:text="Send"
+            android:onClick="sendMessage"/>
+
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

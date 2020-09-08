@@ -1,11 +1,6 @@
 package online.litterae.familyorganizer.implementation.notifications
 
-import android.content.res.Resources
-import android.graphics.drawable.Icon
-import android.opengl.Visibility
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,26 +8,22 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.appcompat.content.res.AppCompatResources.getDrawable
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import online.litterae.familyorganizer.R
 import online.litterae.familyorganizer.abstracts.view.BaseCompatActivity
-import online.litterae.familyorganizer.abstracts.view.PageActivity
 import online.litterae.familyorganizer.application.Const.Companion.STATUS_ACCEPTED
 import online.litterae.familyorganizer.application.Const.Companion.STATUS_DECLINED
 import online.litterae.familyorganizer.application.Const.Companion.STATUS_NEW
 import online.litterae.familyorganizer.application.MainApplication
-import online.litterae.familyorganizer.implementation.family.FamilyContract
-import online.litterae.familyorganizer.application.Const.Companion.TAG
 import javax.inject.Inject
 
 class NotificationsActivity : BaseCompatActivity(), NotificationsContract.View {
     @Inject
     lateinit var presenter : NotificationsContract.Presenter
 
-    lateinit var adapter: NotificationsAdapter
+    private lateinit var adapter: NotificationsAdapter
+
     var notifications: ArrayList<Notification> = ArrayList()
 
     override fun init(savedInstanceState: Bundle?) {
@@ -50,9 +41,9 @@ class NotificationsActivity : BaseCompatActivity(), NotificationsContract.View {
     private fun setRecyclerView () {
         val usersRecycler : RecyclerView = findViewById(R.id.rv_notifications)
         usersRecycler.setHasFixedSize(true)
-        usersRecycler.setLayoutManager(LinearLayoutManager(this))
+        usersRecycler.layoutManager = LinearLayoutManager(this)
         adapter = NotificationsAdapter()
-        usersRecycler.setAdapter(adapter)
+        usersRecycler.adapter = adapter
     }
 
     inner class NotificationsAdapter : RecyclerView.Adapter<NotificationsViewHolder>() {
@@ -62,10 +53,9 @@ class NotificationsActivity : BaseCompatActivity(), NotificationsContract.View {
         }
 
         override fun onBindViewHolder(holder: NotificationsViewHolder, position: Int) {
-            val notification = notifications[position]
-            when (notification) {
+            when (val notification = notifications[position]) {
                 is ReceivedInvitationNotification -> {
-                    holder.notification.setText(notification.shortMessage)
+                    holder.notification.text = notification.shortMessage
                     when (notification.status) {
                         STATUS_NEW -> {
                             holder.image.setImageResource(R.drawable.ic_notifications)

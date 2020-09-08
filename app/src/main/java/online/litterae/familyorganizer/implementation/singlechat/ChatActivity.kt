@@ -1,32 +1,21 @@
 package online.litterae.familyorganizer.implementation.singlechat
 
-import android.content.Intent
-import android.graphics.Color
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
-import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_chat.*
 import online.litterae.familyorganizer.R
 import online.litterae.familyorganizer.abstracts.view.BaseCompatActivity
-import online.litterae.familyorganizer.application.Const
 import online.litterae.familyorganizer.application.Const.Companion.KEY_MY_FRIEND
+import online.litterae.familyorganizer.application.Const.Companion.TYPE_MESSAGE_RECEIVED
+import online.litterae.familyorganizer.application.Const.Companion.TYPE_MESSAGE_SENT
 import online.litterae.familyorganizer.application.MainApplication
-import online.litterae.familyorganizer.dagger.PageComponent
-import online.litterae.familyorganizer.dagger.SingleChatComponent
-import online.litterae.familyorganizer.implementation.family.FamilyActivity
-import online.litterae.familyorganizer.implementation.notifications.NotificationsContract
 import online.litterae.familyorganizer.sqlite.MyFriend
-import java.text.SimpleDateFormat
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.ArrayList
@@ -34,16 +23,19 @@ import kotlin.collections.ArrayList
 class ChatActivity : BaseCompatActivity(), ChatContract.View {
     @Inject
     lateinit var presenter : ChatContract.Presenter
-    lateinit var adapter: MessageAdapter
+
+    private lateinit var messagesRecycler : RecyclerView
+    private lateinit var adapter: MessageAdapter
+
     lateinit var myFirebaseKey: String
-    lateinit var friendFirebaseKey: String
+    private lateinit var friendFirebaseKey: String
 
     var messagesList : List<Message> = ArrayList()
 
     override fun init(savedInstanceState: Bundle?) {
         setContentView(R.layout.activity_chat)
         setRecyclerView()
-        val chatModule : ChatModule = ChatModule(getFriendFromIntent().userFirebaseKey)
+        val chatModule = ChatModule(getFriendFromIntent())
         MainApplication.getAppComponent()
             .createPageComponent()
             .createSingleChatComponent(chatModule)
@@ -57,24 +49,40 @@ class ChatActivity : BaseCompatActivity(), ChatContract.View {
     }
 
     private fun setRecyclerView() {
-        val messagesRecycler : RecyclerView = findViewById(R.id.rv_messages)
+        messagesRecycler = findViewById(R.id.rv_messages)
         messagesRecycler.setHasFixedSize(true)
-        messagesRecycler.setLayoutManager(LinearLayoutManager(this))
+        messagesRecycler.layoutManager = LinearLayoutManager(this)
         adapter = MessageAdapter()
-        messagesRecycler.setAdapter(adapter)
+        messagesRecycler.adapter = adapter
+        messagesRecycler.addOnLayoutChangeListener{
+                _, _, _, _, bottom, _, _, _, oldBottom ->
+            if (bottom < oldBottom) {
+                scrollToBottom()
+            }
+        }
     }
 
-    override fun showMessages(messages: List<Message>, myFirebaseKey: String, friendFirebaseKey: String) {
+    private fun scrollToBottom() {
+        val count = adapter.itemCount
+        messagesRecycler.postDelayed({
+            if (count > 0) {
+                messagesRecycler.smoothScrollToPosition(
+                    count - 1)
+            }
+        }, 100)
+    }
+
+    override fun showMessages(messages: List<Message>, myFirebaseKey: String, myFriend: MyFriend) {
         this.myFirebaseKey = myFirebaseKey
-        this.friendFirebaseKey = friendFirebaseKey
+        this.friendFirebaseKey = myFriend.userFirebaseKey
         messagesList = messages
         adapter.notifyDataSetChanged()
+        scrollToBottom()
     }
 
     override fun getFriendFromIntent(): MyFriend {
         val myFriendJson = intent.getStringExtra(KEY_MY_FRIEND)
-        val myFriend = Gson().fromJson(myFriendJson, MyFriend::class.java)
-        return myFriend
+        return Gson().fromJson(myFriendJson, MyFriend::class.java)
     }
 
     override fun showFriend(myFriend: MyFriend) {
@@ -86,42 +94,50 @@ class ChatActivity : BaseCompatActivity(), ChatContract.View {
         val date = Date()
         presenter.sendMessage(text, date)
         et_message.setText("")
+        scrollToBottom()
     }
 
     inner class MessageAdapter : RecyclerView.Adapter<MessageViewHolder>() {
-        val dateManager = DateManager()
-        val gson = Gson()
+        override fun getItemViewType(position: Int): Int {
+            val message = messagesList[position]
+            return if (message.sender == myFirebaseKey)
+                TYPE_MESSAGE_SENT
+            else
+                TYPE_MESSAGE_RECEIVED
+        }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageViewHolder {
-            return MessageViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.message, parent, false))
+            return if (viewType == TYPE_MESSAGE_SENT) {
+                MessageViewHolder(
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.message_sent, parent, false)
+                )
+            } else {
+                MessageViewHolder(
+                    LayoutInflater.from(parent.context)
+                        .inflate(R.layout.message_received, parent, false)
+                )
+            }
         }
 
         override fun onBindViewHolder(holder: MessageViewHolder, position: Int) {
             val message = messagesList[position]
-            holder.messageText.text = message.text
-            holder.messageDate.text = dateManager.formatDate(gson.fromJson(message.date, Date::class.java))
-            when (message.sender) {
-                myFirebaseKey -> {
-                    holder.marginLeft.visibility = View.INVISIBLE
-                    holder.marginRight.visibility = View.GONE
-                    holder.messageBody.setBackgroundColor(Color.rgb(179, 255, 153))
-                }
-                friendFirebaseKey -> {
-                    holder.marginLeft.visibility = View.GONE
-                    holder.marginRight.visibility = View.INVISIBLE
-                    holder.messageBody.setBackgroundColor(Color.WHITE)
-                }
-            }
+            holder.bind(message)
         }
 
         override fun getItemCount(): Int = messagesList.size
     }
 
-    class MessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val messageBody : CardView = itemView.findViewById(R.id.message_body)
-        val messageText : TextView = itemView.findViewById(R.id.tv_message_text)
-        val messageDate : TextView = itemView.findViewById(R.id.tv_message_date)
-        val marginLeft : TextView = itemView.findViewById(R.id.message_margin_left)
-        val marginRight : TextView = itemView.findViewById(R.id.message_margin_right)
+    open class MessageViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        private val dateManager = DateManager()
+        val gson = Gson()
+
+        private val messageBody : TextView = itemView.findViewById(R.id.tv_message_body)
+        private val messageDate : TextView = itemView.findViewById(R.id.tv_message_time)
+
+        fun bind(message: Message) {
+            messageBody.text = message.text
+            messageDate.text = dateManager.formatDate(gson.fromJson(message.date, Date::class.java))
+        }
     }
 }

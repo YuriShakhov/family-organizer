@@ -4,7 +4,6 @@ import online.litterae.familyorganizer.abstracts.firebase.BaseFirebaseManagerInt
 import online.litterae.familyorganizer.abstracts.presenter.BasePresenterInterface
 import online.litterae.familyorganizer.abstracts.sqlite.BaseSqliteManagerInterface
 import online.litterae.familyorganizer.abstracts.view.BaseViewInterface
-import online.litterae.familyorganizer.firebase.Email
 import online.litterae.familyorganizer.firebase.Invitation
 import online.litterae.familyorganizer.sqlite.MyFriend
 import online.litterae.familyorganizer.sqlite.MyGroup
@@ -28,6 +27,7 @@ interface FamilyContract {
         fun createGroup(groupName: String)
         fun sendInvitation(myGroup: MyGroup, invitedEmail: String, message: String)
         fun logout()
+
         //from firebaseManager
         fun processReceivedInvitation(invitation: Invitation)
         fun onInvitationAddedToFirebase(invitation: Invitation)

@@ -1,14 +1,12 @@
 package online.litterae.familyorganizer.sqlite
 
-import android.util.Log
 import androidx.room.*
-import online.litterae.familyorganizer.application.Const.Companion.TAG
 
 @Dao
 interface MyGroupDao {
     @Query("SELECT * FROM MyGroup")
     fun getAll(): List<MyGroup?>?
-//
+
 //    @Query("SELECT * FROM MYGROUP WHERE iAmAdmin = 1")
 //    fun getMyModeratedGroups(): List<MyGroup?>?
 //
@@ -30,24 +28,27 @@ interface MyGroupDao {
     @Query("SELECT iAmAdmin FROM MyGroup WHERE myCurrentGroup = 1")
     suspend fun isMyModeratedGroup(): Int?
 
-    @Query("UPDATE MyGroup SET myCurrentGroup = 1 WHERE firebaseKey = :firebaseKey")
-    suspend fun markGroupAsCurrent(firebaseKey: String)
+    @Query("SELECT groupChatMessages FROM MyGroup WHERE groupFirebaseKey = :groupFirebaseKey")
+    suspend fun getMessages(groupFirebaseKey: String?): String?
 
-    @Query("UPDATE MyGroup SET myCurrentGroup = 0 WHERE NOT firebaseKey = :firebaseKey")
-    suspend fun unmarkOtherGroups(firebaseKey: String)
+    @Query("UPDATE MyGroup SET myCurrentGroup = 1 WHERE groupFirebaseKey = :groupFirebaseKey")
+    suspend fun markGroupAsCurrent(groupFirebaseKey: String)
+
+    @Query("UPDATE MyGroup SET myCurrentGroup = 0 WHERE NOT groupFirebaseKey = :groupFirebaseKey")
+    suspend fun unmarkOtherGroups(groupFirebaseKey: String)
 
     @Transaction
-    suspend fun setGroupAsCurrent(firebaseKey: String) {
-        markGroupAsCurrent(firebaseKey)
-        unmarkOtherGroups(firebaseKey)
+    suspend fun setGroupAsCurrent(groupFirebaseKey: String) {
+        markGroupAsCurrent(groupFirebaseKey)
+        unmarkOtherGroups(groupFirebaseKey)
     }
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(group: MyGroup?)
 
-//    @Update
-//    fun update(group: MyGroup?)
-//
+    @Update
+    fun update(group: MyGroup?)
+
 //    @Delete
 //    fun delete(group: MyGroup?)
 }
